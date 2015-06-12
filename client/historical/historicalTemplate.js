@@ -31,20 +31,41 @@ Template.historyHeader.helpers({
     managerProjects.forEach(function (p) {
       managerProjIds.push(p.id);
     });
-
+    var zeroCount = 0;
+    var zeroEntry = false;
+    var entryLength = 0;
     // logger.debug('userId = ' + userId);
     if (userId !== '') {
       TimeSheet.find({
         'userId': userId, 'projectApprovalArray.projectId': project
       }, sort).forEach(
           function (u) {
+            console.log(u);
             // logger.debug('u(userID found) = ' + JSON.stringify(u));
             timesheetProjects = [];
             u.projectEntriesArray.forEach(function (p) {
-              timesheetProjects.push(p.projectId);
+              p.EntryArray.forEach(function (entry){
+                entryLength = entry.length;
+                entry.hours.forEach(function (hours){
+                  // console.log(hours);
+                  if(hours === 0){
+                    zeroCount++;
+                    // console.log(zeroCount);
+                  }
+                });
+              });
+              if(zeroCount === 6){
+                  zeroEntry = true;
+                  console.log(zeroEntry);
+              }
+              if(zeroEntry){
+                timesheetProjects.push(p.projectId);
+              }
             });
             if (findOneInArray(managerProjIds, timesheetProjects) || user.admin) {
-              timesheets = ActiveDBService.getTimesheetRowInfo(u, timesheets);
+              if(zeroEntry){
+                timesheets = ActiveDBService.getTimesheetRowInfo(u, timesheets);
+              }
             }
           });
     } else {
@@ -52,18 +73,46 @@ Template.historyHeader.helpers({
         'userId': {$in: subordinates}, 'projectApprovalArray.projectId': project
       }, sort).forEach(
           function (u) {
+            console.log(u);
             // logger.debug('u(userID not found) = ' + JSON.stringify(u));
             timesheetProjects = [];
-            u.projectApprovalArray.forEach(function (p) {
-              timesheetProjects.push(p.projectId);
+            u.projectEntriesArray.forEach(function (p) {
+              p.EntryArray.forEach(function (entry){
+                entryLength = entry.length;
+                entry.hours.forEach(function (hours){
+                  // console.log(hours);
+                  if(hours === 0){
+                    zeroCount++;
+                    // console.log(zeroCount);
+                  }
+                });
+                if(zeroCount === 6){
+                  console.log(zeroEntry);
+                  zeroEntry = true;
+                }
+              });
             });
+
+            u.projectApprovalArray.forEach(function (p) {
+              if(zeroEntry){
+                timesheetProjects.push(p.projectId);
+              }
+          
+            });
+
             if (findOneInArray(managerProjIds, timesheetProjects) || u.userId === user._id || user.admin) {
-              timesheets = ActiveDBService.getTimesheetRowInfo(u, timesheets);
+              if(zeroEntry){
+                timesheets = ActiveDBService.getTimesheetRowInfo(u, timesheets);
+              }
             }
           });
     }
     // logger.debug('timesheets = ' + JSON.stringify(timesheets));
-    return timesheets;
+    if(zeroEntry){
+       return timesheets;
+    }else {
+      return null;
+    }
   },
 
   getProjects: function () {

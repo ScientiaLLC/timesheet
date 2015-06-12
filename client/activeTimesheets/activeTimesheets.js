@@ -1151,6 +1151,7 @@ Template.projectHours.events = {
     // I added this so we can retrieve the selected project's ID so we can add it to the Database
     var projectIndex = $(row).find('#project_select')[0].selectedIndex;
     var projectId = $(row).find('#project_select')[0].children[projectIndex].id;
+    console.log(projectId);
 
     Session.get("max_Row");
     var rowID = Session.get("max_Row") + 1;
