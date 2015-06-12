@@ -147,21 +147,16 @@ Template.addProject.events = {
 
         ProjectService.removeErrorClasses(row, ['#charge_number', '#project_name', '#start_date', '#end_date','#manager']);
 
-        if (chargeNumber === 'Indirect') {
+        if (Session.get('isIndirect')) {
             if(ProjectService.ensureValidIndirectProject(row, chargeNumber, customer, name, manager)) {
                 var projects = ChargeNumbers.find({});
                 var projIds = [];
                 projects.forEach(function(p) {
                     projIds.push(p.id);
                 });
-                var chargeNum = Math.floor(Math.random()*9000) + 1000;
-
-                while($.inArray(chargeNum, projIds) !== -1) {
-                    chargeNum = Math.floor(Math.random()*9000) + 1000;
-                }
 
                 Meteor.call('addNewProject', {
-                    'id': chargeNum.toString(),
+                    'id': chargeNumber,
                     'name': name,
                     'customer': customer,
                     'start_date': startDate,
@@ -197,9 +192,10 @@ Template.addProject.events = {
     }
     },
     'click #indirect': function(event) {
-        var row = event.currentTarget.parentNode.parentNode;
-        $(row).find('#charge_number')[0].value = 'Indirect';
-        $(row).find('#charge_number')[0].disabled = true;
+    //     var row = event.currentTarget.parentNode.parentNode;
+    //     $(row).find('#charge_number')[0].value = 'Indirect';
+    //     $(row).find('#charge_number')[0].disabled = true;
+         Session.set("isIndirect",true);
     },
     'click #nonIndirect': function(event) {
         var row = event.currentTarget.parentNode.parentNode;
