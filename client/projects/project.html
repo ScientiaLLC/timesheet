@@ -36,7 +36,8 @@
         <div class="col-md-1 col-sm-1 col-xs-1"> <input type="text" class="large-input form-control date" id="start_date" value={{start_date}}></div>
         <div class="col-md-1 col-sm-1 col-xs-1"> <input type="text" class="large-input form-control date" id="end_date" value={{end_date}}></div>
         <div class="col-md-2 col-sm-2 col-xs-2"> <input type="text" class="large-input form-control manager" id="manager" value={{manager}}></div>
-        <div class="col-md-1 col-sm-1 col-xs-1"><button type="button" class="btn btn-primary">Make Indirect</button></div>
+        <div class="col-md-1 col-sm-1 col-xs-1"><button id="makeIndirect" type="button" class="btn btn-primary">Make Indirect</button></div>
+        <div class="col-md-1 col-sm-1 col-xs-1"><button id="delete" type="button" class="btn btn-primary">Delete</button></div>
     </div>
 </template>
 
@@ -130,6 +131,7 @@
         <div class="col-md-1 col-sm-1 col-xs-1"> <input type="text" class="large-input form-control date" id="start_date" value={{start_date}} disabled={{is_holiday}}></div>
         <div class="col-md-1 col-sm-1 col-xs-1"> <input type="text" class="large-input form-control date" id="end_date" value={{end_date}} disabled={{is_holiday}}></div>
         <div class="col-md-2 col-sm-2 col-xs-2"> <input type="text" class="large-input form-control manager" id="manager" value={{manager}} disabled={{is_holiday}}></div>
-        <div class="col-md-1 col-sm-1 col-xs-1"><button type="button" class="btn btn-primary" disabled={{is_holiday}}>Make Direct</button></div>
+        <div class="col-md-1 col-sm-1 col-xs-1"><button id="makeDirect" type="button" class="btn btn-primary" disabled={{is_holiday}}>Make Direct</button></div>
+        <div class="col-md-1 col-sm-1 col-xs-1"><button id="delete" type="button" class="btn btn-primary">Delete</button></div>
     </div>
 </template>

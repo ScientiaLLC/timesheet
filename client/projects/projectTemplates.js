@@ -87,7 +87,7 @@ Template.projectInfo.events = {
         var parent = evt.currentTarget.parentNode;
         parent.innerHTML = Blaze.toHTML(Blaze.With('', function() { return Template.employeesListDropDown; }));
     },
-    'click button': function(event){
+    'click #makeIndirect': function(event){
         var row = event.currentTarget.parentNode.parentNode;
         var chargeNumber = $(row).find('#charge_number')[0].value;
         var name = $(row).find('#project_name')[0].value;
@@ -114,7 +114,11 @@ Template.projectInfo.events = {
                 $('.toast').removeClass('active');
             }, 5000);
         });
+    },
+    'click #delete': function(event){
+        ChargeNumbers.remove(this._id);   
     }
+
 };
 
 Template.projectInfo.rendered = function(){
@@ -270,7 +274,7 @@ Template.indirectChargeItems.events({
         var parent = evt.currentTarget.parentNode;
         parent.innerHTML = Blaze.toHTML(Blaze.With('', function() { return Template.employeesListDropDown; }));
     },
-    'click button': function(event){
+    'click #makeDirect': function(event){
         var row = event.currentTarget.parentNode.parentNode;
         var name = $(row).find('#project_name')[0].value;
         var customer = $(row).find('#customer')[0].value;
@@ -296,6 +300,9 @@ Template.indirectChargeItems.events({
                 $('.toast').removeClass('active');
             }, 5000);
         });
+    },
+    'click #delete': function(event){
+        ChargeNumbers.remove(this._id);   
     }
 });
 

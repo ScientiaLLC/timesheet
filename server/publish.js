@@ -15,42 +15,51 @@ Meteor.publish('userData', function () {
       manager: 1,
       projects: 1,
       groups: 1
-    }
+    } 
   });
 });
 
-Meteor.publish('projects', function () {
-  return ChargeNumbers.find();
+Meteor.publish('projects', function() {
+    return ChargeNumbers.find();
 });
 
-Meteor.publish('timesheet', function () {
-  return TimeSheet.find();
+ChargeNumbers.allow({
+    remove: function(id){
+        return true;
+    },
+    insert: function(id,name,customer,start_date,end_date,manager,indirect){
+        return true;
+    }
+});
+
+Meteor.publish('timesheet', function() {
+    return TimeSheet.find();
 });
 
 TimeSheet.allow({
-  insert: function (userId, user) {
-    return true;
-  },
-  update: function (userId, users, fields, modifier) {
-    return true;
-  },
-  remove: function (userId, users) {
-    return false;
-  }
+    insert: function(userId, user){
+        return true;
+    },
+    update: function (userId, users, fields, modifier) {
+        return true;
+    },
+    remove: function(userId, users){
+        return false;
+    }
 });
 
-Meteor.publish('serverjobs', function () {
-  return Jobs.find();
+Meteor.publish('serverjobs', function() {
+    return Jobs.find();
 });
 
 Jobs.allow({
-  insert: function (userId, user) {
-    return true;
-  },
-  update: function (userId, users, fields, modifier) {
-    return true;
-  },
-  remove: function (userId, users) {
-    return true;
-  }
+    insert: function(userId, user){
+        return true;
+    },
+    update: function (userId, users, fields, modifier) {
+        return true;
+    },
+    remove: function(userId, users){
+        return true;
+    }
 });
