@@ -20,3 +20,5 @@ percolate:synced-cron
 msavin:mongol
 msavin:jetsetter
 mike:mocha@0.6.0
+iron:router
+meteorhacks:subs-manager

@@ -46,64 +46,28 @@ Template.pages.events({
 });
 
 Template.pages.helpers({
-  isTimesheet: function () {
-    return Session.equals('current_page', 'time_sheet') ||
-        Session.equals('current_page', 'selected_timesheet');
-  },
-
-  isHistorical: function () {
-    Session.set('historyDate', new Date());
-    Session.set('yearSelect', false);
-    return Session.equals('current_page', 'historical_page');
-  },
-
-  isActiveProjects: function () {
-    return Session.equals('current_page', 'active_projects');
-  },
-
-  isEmployeeSettings: function () {
-    return Session.equals('current_page', 'employees_settings');
-  },
-
-  isAdminPage: function () {
-    return Session.equals('current_page', 'admin_page');
-  },
-
-  getUsername: function () {
-    var user = Meteor.users.findOne({_id: Session.get('LdapId')});
-    if (!user) {
-      return 'Please login';
-    }
-    return user.username;
-  },
-
-  isSelectedTimesheet: function () {
-    return Session.equals('current_page', 'selected_timesheet');
-  },
-
-  isHistoricalTimesheet: function () {
-    return Session.equals('current_page', 'historical_timesheet');
-  },
-
-  isLoginPage: function () {
-    return Session.equals('current_page', 'login_page');
-  },
-
-  isApproval: function () {
-    return Session.equals('current_page', 'approval_page');
-  },
-
-  isManager: function () {
-    var id = Session.get('LdapId');
-    if (!id) {
-      return;
-    }
-    var user = Meteor.users.findOne({_id: id});
-    if (!user) {
-      return false;
-    }
-    return user.manager;
-  },
+ getUsername: function () {
+        var user = Meteor.users.findOne({_id: Session.get('LdapId')});
+        if (!user){
+            return 'Please login';
+        }
+        return user.username;
+    },
+    isLogin: function() {
+        var id = Session.get('LdapId');
+        return Session.get('LdapId');
+    },
+    isManager: function () {
+        var id = Session.get('LdapId');
+        if (!id){
+            return;
+        }
+        var user = Meteor.users.findOne({_id: id});
+        if (!user){
+            return false;
+        }
+        return user.manager;
+    },
 
   isAdmin: function () {
     var id = Session.get('LdapId');
@@ -129,43 +93,7 @@ Template.pages.helpers({
   }
 });
 
-Template.mainSelector.helpers({
-  isTimesheet: function () {
-    return Session.equals('current_page', 'time_sheet');
-  },
 
-  isHistorical: function () {
-    return Session.equals('current_page', 'historical_page');
-  },
-
-  isActiveProjects: function () {
-    return Session.equals('current_page', 'active_projects');
-  },
-
-  isEmployeeSettings: function () {
-    return Session.equals('current_page', 'employees_settings');
-  },
-
-  isSelectedTimesheet: function () {
-    return Session.equals('current_page', 'selected_timesheet');
-  },
-
-  isHistoricalTimesheet: function () {
-    return Session.equals('current_page', 'historical_timesheet');
-  },
-
-  isApproval: function () {
-    return Session.equals('current_page', 'approval_page');
-  },
-
-  isLoginPage: function () {
-    return Session.equals('current_page', 'login_page');
-  },
-
-  isAdminPage: function () {
-    return Session.equals('current_page', 'admin_page');
-  }
-});
 Template.loginPage.events({
   'click .btn': function (event) {
     /*
@@ -187,6 +115,8 @@ Template.loginPage.events({
       }
     });
     authenticateLdapEmployee(username, password);
+
+    Router.go('SelectedTimesheet');
   }
 });
 
