@@ -69,7 +69,7 @@ Template.historyHeader.helpers({
   getProjects: function () {
     var projects = [];
     if (Session.get('search_project')) {
-      var project = ChargeNumbers.findOne({'_id': Session.get('search_project')});
+      var project = ChargeNumbers.findOne({'name': Session.get('search_project')});
       projects.push(project);
     } else {
       projects = ChargeNumbers.find();
@@ -536,22 +536,21 @@ Template.historyLog.helpers({
 
 Template.historyEmployeeSelect.events({
   'click button': function (event, template) {
-    var employee = template.find('#employeeSearch').value;
+    var employee = document.getElementById('defaultemployee').value;
 
     var employeeID = '';
     var employees = Meteor.users.find({'username': employee});
+
     employees.forEach(function (e) {
       employeeID = e._id;
     });
-
-    var project = template.find('#projectSearch').value;
-    if (project !== '') {
-      project = project.split(' - ')[1];
-    }
+   
+    var project = document.getElementById('defaultproject').value;
+    console.log()
     var projectId = '';
     var projects = ChargeNumbers.find({'name': project});
     projects.forEach(function (p) {
-      projectId = p.id;
+      projectId = p.name;
     });
 
     var user = Meteor.users.findOne({'_id': Session.get('LdapId')});
@@ -566,7 +565,7 @@ Template.historyEmployeeSelect.events({
         Session.set('search_employee', '');
       }
     }
-
+    console.log(projectId);
     Session.set('search_project', projectId);
     Session.set('current_page', 'historical_page');
   }
@@ -578,27 +577,41 @@ Template.historyEmployeeSelect.rendered = function () {
 };
 
 Template.historyEmployeeSelect.helpers({
-  auto_projects: function () {
+   auto_projects: function () {
     'use strict';
+    var toReturn = [];
     var person = Meteor.users.findOne({'_id': Session.get('LdapId')});
     if (person === null || (!person.manager && !person.admin)) {
       return;
     }
 
     if (person.admin) {
-      return ChargeNumbers.find().fetch().map(function (cn) {
-        return '' + cn.id + ' - ' + cn.name;
+       ChargeNumbers.find().fetch().map(function (cn) {
+        toReturn.push({
+          name: cn.name,
+          text: cn.name
+        });
       });
-    }
-    return ChargeNumbers.find({'manager': {$in: person.groups}}).fetch().map(function (cn) {
-      return '' + cn.id + ' - ' + cn.name;
-    });
+    } else{
+      ChargeNumbers.find({'manager': {$in: person.groups}}).fetch().map(function (cn) {
+        toReturn.push({
+            name: cn.name,
+            text: cn.name
+          });
+      });
+  }
+  return toReturn;
   },
 
   auto_employees: function () {
-    return Meteor.users.find().fetch().map(function (emp) {
-      return emp.username;
+    var toReturn = []; 
+    Meteor.users.find().fetch().map(function (emp) {
+        toReturn.push({
+          name: emp.username,
+          text: emp.username
+        });
     });
+    return toReturn;
   }
 });
 

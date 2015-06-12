@@ -21,20 +21,21 @@
   <div class="row">
 
     <div class="col-md-2 col-sm-2 col-xs-2">
-      <input class="form-control typeahead" name="employee" type="text"
-             onClick="this.setSelectionRange(0, this.value.length)"
-             id="employeeSearch"
-             placeholder="Username"
-             autocomplete="off" spellcheck="off"
-             data-source="auto_employees"/>
+     <input name="employees" type="text" id="defaultemployee" list="employees" placeholder="Username">
+      
+      <datalist id="employees">
+        {{#each auto_employees}}
+        <option id="employeeVal" value="{{name}}">{text}}</option>
+        {{/each}}
+      </datalist>
     </div>
     <div class="col-md-2 col-sm-2 col-xs-2">
-      <input class="form-control typeahead" name="projects" type="text"
-             onClick="this.setSelectionRange(0, this.value.length)"
-             id="projectSearch"
-             placeholder="Project"
-             autocomplete="off" spellcheck="off"
-             data-source="auto_projects"/>
+       <input type="text" id="defaultproject" list="projects" placeholder="Project">
+      <datalist id="projects">
+        {{#each auto_projects}}
+        <option value="{{name}}">{text}}</option>
+        {{/each}}
+      </datalist>
     </div>
     <div class="col-md-2 col-sm-2 col-xs-2">
       <button type="button" class="btn btn-success">Search</button>
