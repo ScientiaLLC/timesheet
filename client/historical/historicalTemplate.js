@@ -139,27 +139,19 @@ Template.history_month_picker.rendered = function () {
 Template.history_month_picker.helpers({
   currentYear: function () {
     var currentTime;
-    if (Session.get('historyDate') === null) {
-      currentTime = new Date();
-      currentTime.setDate(1);
-      Session.set('historyDate', currentTime);
-    } else {
-      currentTime = Session.get('historyDate');
-    }
+    currentTime = new Date();
+    currentTime.setDate(1);
+    Session.set('historyDate', currentTime);
 
     return currentTime.getFullYear();
   },
 
   currentMonth: function () {
     var currentTime;
-    if (Session.get('historyDate') === null) {
       currentTime = new Date();
       currentTime.setDate(1);
       Session.set('historyDate', currentTime);
-    } else {
-      currentTime = Session.get('historyDate');
-    }
-
+  
     return generalHelpers.getMonthName(currentTime.getMonth());
   }
 });
