@@ -485,7 +485,7 @@ Template.approval_Template.events({
   },
   'click #showbtn': function (e) {
     if (Session.get('showAll') == null) {
-      Session.set('showAll', true);
+      Session.set('showAll', false);
       e.target.innerHTML = "Hide Approved Time";
     }
     Session.set('showAll', !Session.get('showAll'));
@@ -495,8 +495,8 @@ Template.approval_Template.events({
     } else {
       e.target.innerHTML = "Show Approved Time";
     }
-
   }
+  
 });
 
 Template.date_picker.helpers({
