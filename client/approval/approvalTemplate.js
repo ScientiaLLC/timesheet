@@ -2,6 +2,7 @@
  * Created by sternetj on 12/7/14.
  */
 Session.set('current_project_to_approve', 'none');
+Session.set('showZeroHours',false);
 var days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Next Week Goals",
   "Issues", "Concerns", "General Comment"];
 
@@ -48,7 +49,7 @@ Template.toApprove_Template.helpers({
               total += parseFloat(a.hours[b]);
               console.log("total " +total);
             }
-            if(total === 0){
+            if(total === 0 ){
               zeroEntry.push(pe.projectId);
             }
           });
@@ -71,7 +72,7 @@ Template.toApprove_Template.helpers({
               approved: !show
             };
           }
-          if(!containsInArray(pe.projectId,zeroEntry)){
+          if(!containsInArray(pe.projectId,zeroEntry) || Session.get('showZeroHours')){
             
             totals[t.userId] =
             {
@@ -107,7 +108,7 @@ Template.toApprove_Template.helpers({
     for (var key in totals) {
       if (totals.hasOwnProperty(key) && (!totals[key].approved || Session.get('showAll'))) {
         var u = Meteor.users.findOne({_id: key});
-        if(totals[key].total != 0){
+        if(totals[key].total != 0 || Session.get('showZeroHours')){
           toReturn.push({
             selected: '',
             submitted: hasSubmitted[key],
@@ -505,6 +506,19 @@ Template.approval_Template.events({
       e.target.innerHTML = "Hide Approved Time";
     } else {
       e.target.innerHTML = "Show Approved Time";
+    }
+  },
+  'click #showAll': function (e) {
+    if (Session.get('showZeroHours') == null) {
+      Session.set('showZeroHours', false);
+      e.target.innerHTML = "Hide Zero Hours";
+    }
+    Session.set('showZeroHours', !Session.get('showZeroHours'));
+
+    if (Session.get('showZeroHours')) {
+      e.target.innerHTML = "Hide Zero Hours";
+    } else {
+      e.target.innerHTML = "Show Zero Hours";
     }
   }
   
