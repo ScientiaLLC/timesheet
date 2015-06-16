@@ -281,6 +281,7 @@ Meteor.methods({
      This entry corresponds to a single Row on the web page.
      */
     var sheet = TimeSheet.findOne({'startDate': date, 'userId': user});
+    console.log("sheet");
 
     var prEntriesArr = sheet['projectEntriesArray'];
     var entryArrToAdd = null;

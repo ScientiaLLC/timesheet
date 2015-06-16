@@ -1,3 +1,4 @@
+var timesheetsPidUsed = [];
 ActiveDBService = {
   getDayTotal: function (day) {
     var date = Session.get('startDate');
@@ -83,7 +84,7 @@ ActiveDBService = {
     return [user._id];
   },
 
-  getTimesheetRowInfo: function (sheet, timesheets) {
+  getTimesheetRowInfo: function (sheet, timesheets,projectID) {
     var date = Session.get('historyDate');
     var timesheetsMap = {};
     var timesheetYear = sheet.startDate.split('/')[2];
@@ -94,7 +95,7 @@ ActiveDBService = {
         timesheetMonth === (date.getMonth() + 1).toString())) {
       if (!(sheet.startDate in timesheetsMap)) {
         timesheetsMap[sheet.startDate] = timesheets.length;
-        timesheets[timesheetsMap[sheet.startDate]] = {
+        timesheets[timesheets.length] = {
           employee: employee,
           startDate: sheet.startDate,
           sun: 0,
@@ -109,7 +110,7 @@ ActiveDBService = {
       for (var pIndex in sheet.projectEntriesArray) {
         if (sheet.projectEntriesArray.hasOwnProperty(pIndex)) {
           for (var eIndex in sheet.projectEntriesArray[pIndex].EntryArray) {
-            if (sheet.projectEntriesArray[pIndex].EntryArray.hasOwnProperty(eIndex)) {
+            if (sheet.projectEntriesArray[pIndex].EntryArray.hasOwnProperty(eIndex) && projectID === sheet.projectEntriesArray[pIndex].projectId) {
               var entry = sheet.projectEntriesArray[pIndex].EntryArray[eIndex],
                   days = entry.hours,
                   current = timesheets[timesheetsMap[sheet.startDate]];
@@ -130,7 +131,8 @@ ActiveDBService = {
       }
     }
 
-    return timesheets;
+  timesheetsPidUsed.push(projectID);
+  return timesheets;
   },
 
   updateRowInTimeSheet: function (date, user, project, comment, Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, rowID, callback) {
@@ -227,3 +229,11 @@ ActiveDBService = {
     Meteor.call('updateGenComments', date, user, gen_comment, concerns, callback);
   }
 };
+var containsInArray = function(item, array){
+    for(var i =0; i<array.length;i++){
+      if(item === array[i]){
+        return true;
+      }
+    }
+    return false;
+}

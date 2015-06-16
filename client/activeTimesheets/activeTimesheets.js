@@ -1180,8 +1180,9 @@ Template.projectHours.events = {
       var sheet = TimeSheet.findOne({'startDate': date, 'userId': user});
 
       var data = Session.get('editing-user-page');
-
+      console.log("here");
       if (!sheet['submitted'] || TimeSheetService.checkSentBack() || data) {
+        console.log("in if");
         Meteor.call('addRowToTimeSheet', Session.get("startDate"), user, projectId,
             comment_t,
             sunday_t,
