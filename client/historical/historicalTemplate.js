@@ -17,7 +17,6 @@ Template.historyHeader.helpers({
    * If they searched for a specific employee name, get only that employee's timesheets.
    */
   getTimesheets: function (project) {
-    console.log("passed in project "+project);
     var userId = '';
     if (Session.get('search_employee')) {
       userId = Session.get('search_employee');
@@ -82,7 +81,6 @@ Template.historyHeader.helpers({
 
   getProjects: function () {
     var projects = [];
-    var zeroCount = 0;
     if (Session.get('search_project') != null) {
       var project = ChargeNumbers.findOne({'name': Session.get('search_project')}).forEach(function (p){
         TimeSheet.find().forEach(function (timesheets){
@@ -96,7 +94,6 @@ Template.historyHeader.helpers({
     } else {
       var project = ChargeNumbers.find().forEach(function (p) {
         TimeSheet.find().forEach(function (timesheets){
-          // console.log(timesheets.projectEntriesArray);
            if(timesheets.projectEntriesArray != null){
               if(!containsInArray(p, projects)){
               projects.push(p);
@@ -105,7 +102,6 @@ Template.historyHeader.helpers({
         });
       });
     }  
-    console.log(projects);
     return projects;
   },
 
