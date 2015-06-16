@@ -17,11 +17,14 @@ Template.historyHeader.helpers({
    * If they searched for a specific employee name, get only that employee's timesheets.
    */
   getTimesheets: function (project) {
+    console.log("passed in project "+project);
     var userId = '';
     if (Session.get('search_employee')) {
       userId = Session.get('search_employee');
     }
+    var timesheetProjects = [];
     var timesheets = [];
+    var projectsEntries = [];
     var subordinates = ActiveDBService.getEmployeesUnderManager();
     var sort = {'sort': {'userId': 1, 'startDate': -1}};
 
@@ -31,77 +34,78 @@ Template.historyHeader.helpers({
     managerProjects.forEach(function (p) {
       managerProjIds.push(p.id);
     });
-    var zeroCount = 0;
-    var zeroEntry = false;
+  
+    
     // logger.debug('userId = ' + userId);
     if (userId !== '') {
       TimeSheet.find({
-        'userId': userId, 'projectApprovalArray.projectId': project
+        'userId': userId, 'projectEntriesArray.projectId': project
       }, sort).forEach(
           function (u) {
             // logger.debug('u(userID found) = ' + JSON.stringify(u));
-            timesheetProjects = [];
             u.projectEntriesArray.forEach(function (p) {
-              p.EntryArray.forEach(function (entry){
-                entry.hours.forEach(function (hours){
-                  if(hours === 0){
-                    zeroCount++;
-                  }
-                });
-              });
-              if(zeroCount === 6){
-                  zeroEntry = true;
-              }
-              timesheetProjects.push(p.projectId);
+              if(p.projectId === project){
+                
+                  timesheetProjects.push(p.projectId);
+                              
+                if (findOneInArray(managerProjIds, timesheetProjects)  || u.userId === user._id || user.admin ){//&& !containsInArray(p.projectId, timesheetProjects)) {
+                  timesheets = (ActiveDBService.getTimesheetRowInfo(u, timesheets, p.projectId));
+                }  
+              }  
             });
-            if (findOneInArray(managerProjIds, timesheetProjects) || user.admin) {
-              timesheets = ActiveDBService.getTimesheetRowInfo(u, timesheets);
-            }
           });
     } else {
       TimeSheet.find({
-        'userId': {$in: subordinates}, 'projectApprovalArray.projectId': project
+        'userId': {$in: subordinates}, 'projectEntriesArray.projectId': project
       }, sort).forEach(
           function (u) {
             // logger.debug('u(userID not found) = ' + JSON.stringify(u));
-            timesheetProjects = [];
             u.projectEntriesArray.forEach(function (p) {
-              p.EntryArray.forEach(function (entry){
-                entry.hours.forEach(function (hours){
-                  if(hours === 0){
-                    zeroCount++;
-                  }
-                });
-                if(zeroCount === 6){
-                  zeroEntry = true;
-                }
-              });
+              
+              if(p.projectId === project){
+                
+                  timesheetProjects.push(p.projectId);
+                              
+                if (findOneInArray(managerProjIds, timesheetProjects)  || u.userId === user._id || user.admin ){//&& !containsInArray(p.projectId, timesheetProjects)) {
+                  timesheets = (ActiveDBService.getTimesheetRowInfo(u, timesheets, p.projectId));
+                }  
+              }  
             });
-            u.projectApprovalArray.forEach(function (p) {
-                timesheetProjects.push(p.projectId);      
-            });
-
-            if (findOneInArray(managerProjIds, timesheetProjects) || u.userId === user._id || user.admin) {
-                timesheets = ActiveDBService.getTimesheetRowInfo(u, timesheets);
-            }
-          });
-    }
+            
+        });
+      }
+      
     // logger.debug('timesheets = ' + JSON.stringify(timesheets));
-    if(zeroEntry){
-       return timesheets;
-    }else {
-      return null;
-    }
+    return timesheets;
+    
   },
 
   getProjects: function () {
     var projects = [];
-    if (Session.get('search_project')) {
-      var project = ChargeNumbers.findOne({'name': Session.get('search_project')});
-      projects.push(project);
+    var zeroCount = 0;
+    if (Session.get('search_project') != null) {
+      var project = ChargeNumbers.findOne({'name': Session.get('search_project')}).forEach(function (p){
+        TimeSheet.find().forEach(function (timesheets){
+           if(timesheets.projectEntriesArray != null){
+             if(!containsInArray(p, projects)){
+              projects.push(p);
+            }
+          }
+        });
+      });
     } else {
-      projects = ChargeNumbers.find();
-    }
+      var project = ChargeNumbers.find().forEach(function (p) {
+        TimeSheet.find().forEach(function (timesheets){
+          // console.log(timesheets.projectEntriesArray);
+           if(timesheets.projectEntriesArray != null){
+              if(!containsInArray(p, projects)){
+              projects.push(p);
+            }
+          }
+        });
+      });
+    }  
+    console.log(projects);
     return projects;
   },
 
@@ -697,3 +701,11 @@ Template.historical_totals.helpers({
     return total;
   }
 });
+var containsInArray = function(item, array){
+    for(var i =0; i<array.length;i++){
+      if(item === array[i]){
+        return true;
+      }
+    }
+    return false;
+}
