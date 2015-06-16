@@ -23,6 +23,9 @@ Template.toApprove_Template.helpers({
     var totals = {};
     var hasSubmitted = {};
 
+    var zeroEntry = [];
+    var userIdToSubmit = [];
+    var total = 0;
     var startDateStr = Session.get("startDate");
     var startDate = new Date(startDateStr);
     //get timesheets for the selected startdate
@@ -39,11 +42,14 @@ Template.toApprove_Template.helpers({
       }
 
       t.projectEntriesArray.forEach(function (pe) {
-        var total = 0;
         if (pe.projectId == selected && (!pApprovals[pe.projectId] || Session.get('showAll'))) {
           pe.EntryArray.forEach(function (a) {
             for (var b in a.hours) {
               total += parseFloat(a.hours[b]);
+              console.log("total " +total);
+            }
+            if(total === 0){
+              zeroEntry.push(pe.projectId);
             }
           });
         }
@@ -65,13 +71,18 @@ Template.toApprove_Template.helpers({
               approved: !show
             };
           }
-          totals[t.userId] =
-          {
-            total: totals[t.userId].total + total,
-            sentBack: totals[t.userId].sentBack || (rejected && pe.projectId == selected) || !t.submitted,
-            approved: totals[t.userId].approved || (pApprovals[pe.projectId] && pe.projectId == selected)
-          };
+          if(!containsInArray(pe.projectId,zeroEntry)){
+            
+            totals[t.userId] =
+            {
+              total: totals[t.userId].total + total,
+              sentBack: totals[t.userId].sentBack || (rejected && pe.projectId == selected) || !t.submitted,
+              approved: totals[t.userId].approved || (pApprovals[pe.projectId] && pe.projectId == selected)
+            };
+            console.log(totals[t.userId].total);
+          }
         }
+        total =0;
       });
       hasSubmitted[t.userId] = t.submitted;
       if (totals[t.userId] == null) {
@@ -93,18 +104,19 @@ Template.toApprove_Template.helpers({
         }
       }
     });
-
     for (var key in totals) {
       if (totals.hasOwnProperty(key) && (!totals[key].approved || Session.get('showAll'))) {
         var u = Meteor.users.findOne({_id: key});
-        toReturn.push({
-          selected: '',
-          submitted: hasSubmitted[key],
-          sentBack: totals[key].sentBack,
-          username: u.username,
-          total: totals[key].total,
-          color2: totals[key].approved ? "color:#5CB85C" : ""
-        });
+        if(totals[key].total != 0){
+          toReturn.push({
+            selected: '',
+            submitted: hasSubmitted[key],
+            sentBack: totals[key].sentBack,
+            username: u.username,
+            total: totals[key].total,
+            color2: totals[key].approved ? "color:#5CB85C" : ""
+          });
+        }
       }
     }
 
@@ -130,7 +142,6 @@ Template.toApprove_Template.helpers({
       toReturn[0].selected = 'selected';
       Session.set('current_user_to_approve', toReturn[0].username);
     }
-
     return toReturn;
   }
 });
@@ -553,3 +564,11 @@ Template.date_picker.events({
     //Session.set("startDate", d2.toISOString());
   }
 })
+var containsInArray = function(item, array){
+    for(var i =0; i<array.length;i++){
+      if(item === array[i]){
+        return true;
+      }
+    }
+    return false;
+}
