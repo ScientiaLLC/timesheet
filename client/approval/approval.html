@@ -2,6 +2,7 @@
   <div class="container-fluid">
     <h2><span class="label">Approval</span></h2>
     {{>approval_Template}}
+    <!-- {{>approval_Template_For_Users}} -->
   </div>
 </template>
 
@@ -65,6 +66,72 @@
 
     </div>
     <!-- <div class="row-item-divider width-98"></div> -->
+  {{/each}}
+
+</template>
+
+
+<template name="toApprove_Users">
+
+  <!-- {{showUserHours}} -->
+  {{#each showUserHours}}
+  <div class="row row-item toApprove-Rows {{selected}}">
+    {{#if submitted}}
+
+      <div class="col-xs-3 text-center">
+      <div>
+      <div style="display: flex;align-items: center;float:left;z-index:-1">
+        {{#if sentBack}}
+          <div class="glyphicon glyphicon-repeat"
+               style={{color2}} title='Submitted and sent back
+          '></div>
+        {{else}}
+          <div class="glyphicon glyphicon-ok" style={{color2}} title='Timesheet
+               has been Submitted
+          '></div>
+        {{/if}}
+      </div>
+      <div class="text-center" id="project">
+        <h4>{{username}}</h4>
+      </div>
+    </div>
+      </div>
+    {{else}}
+      <div class="col-xs-3 text-center" id="project"><h4>{{username}}</h4>
+      </div>
+    {{/if}}
+    <div class="col-xs-2 text-center"><h4>{{total}}</h4></div>
+    <div class="col-xs-2 text-center">
+      {{#if sentBack}}
+        <button type="{{id}}" class="approve btn btn-success" disabled>Approve
+        </button>
+      {{else}}
+        <button type="{{id}}" class="approve btn btn-success">Approve</button>
+      {{/if}}
+    </div>
+    <div class="col-xs-2 text-center">
+      {{#if sentBack}}
+        <button name="{{id}}" type="button" class="reject btn btn-danger"
+                disabled>Reject
+        </button>
+      {{else}}
+        <button name="{{id}}" type="button" class="reject btn btn-danger">
+          Reject
+        </button>
+      {{/if}}
+    </div>
+    <div class="col-xs-3">
+      {{#if sentBack}}
+        <input id="rejectComment" type="text" class="large-input form-control"
+               disabled value="">
+      {{else}}
+        <input id="rejectComment" type="text"
+               class="large-input form-control enterable" value="">
+      {{/if}}
+    </div>
+
+    </div>
+    
   {{/each}}
 
 </template>
@@ -160,4 +227,78 @@
       </div>
     {{/if}}
   </div>
+<!-- The users selection selection -->
+  <br/>
+  <div class="row">
+    <div class="col-xs-2">
+      <select id="currentproject" class="form-control"
+              type="current-user-checkbox" name="currentuserCombo">
+        {{#each managedUser}}
+          <option value="{{charge_number}}">{{text}}</option>
+        {{/each}}
+      </select>
+    </div>
+
+  </div>
+  <div class="row">
+    {{> date_picker}}
+  </div>
+  <br/>
+
+  <div class="row">
+    {{#if needsApproving}}
+      <div class="row">
+        <div class="col-xs-6">
+          <div class="row">
+            <div class="col-xs-3 text-center"><h4>Project</h4></div>
+            <div class="col-xs-2 text-center"><h4>Total</h4></div>
+            <div class="col-xs-2 text-center"><h4>Approve</h4></div>
+            <div class="col-xs-2 text-center"><h4>Reject</h4></div>
+            <div class="col-xs-3 text-center"><h4>Comment</h4></div>
+          </div>
+          <div id="timesheet_approvals">
+            {{> toApprove_Users}}
+          </div>
+        </div>
+        <div class="col-xs-6 col-divider">
+          <div class="row">
+            <div class="col-xs-12 text-center"><h4>Timesheet</h4></div>
+          </div>
+          <div id="timeSheetReviewer">
+            {{#each userSearchTimesheet}}
+              <div class="row">
+                <div class="col-xs-3"><h4>{{day}}</h4></div>
+                <div class="col-xs-2"><h4>{{hours}}</h4></div>
+                <div class="col-xs-7">
+                  {{#each comment}}
+                    <h4>{{com}}</h4>
+                  {{/each}}
+                </div>
+              </div>
+            {{/each}}
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        {{#if Active_user}}
+          <div class="col-xs-12">
+            <button type="button" style="float: right;"
+                    class="btn btn-lg btn-default edit-sheet">Edit
+            </button>
+          </div>
+        {{/if}}
+
+      </div>
+    {{else}}
+      <div class="row">
+        <div class="col-xs-12">
+          <h2>There are no timesheets to approve.</h2>
+        </div>
+      </div>
+    {{/if}}
+  </div>
 </template>
+
+
+
+
