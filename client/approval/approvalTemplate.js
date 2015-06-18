@@ -184,7 +184,7 @@ Template.toApprove_Users.helpers({
         // console.log(pe);
         // console.log("projectID "+projectId);
         if (!pApprovals[pe.projectId]) {
-         // Session.set('current_project_to_approve', pe.projectId);
+         Session.set('current_user_project_to_approve', pe.projectId);
           pe.EntryArray.forEach(function (a) {
 
             for (var b in a.hours) {
