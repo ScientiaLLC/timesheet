@@ -6,20 +6,40 @@ Template.current_jobs.helpers({
     return Jobs.find().count() > 0;
   }
 });
-
+Template.all_pdfs.helpers({
+   auto_employees: function () {
+    var toReturn = []; 
+    Meteor.users.find().fetch().map(function (emp) {
+        toReturn.push({
+          name: emp.username,
+          text: emp.username
+        });
+    });
+    console.log(toReturn);
+    return toReturn;
+  }
+});
 Template.all_pdfs.events({
   'click .btn': function () {
+    var employee = document.getElementById('defaultemployee').value;
+    var employeeID = '';
+    if(employee){
+      employeeID = Meteor.users.findOne({'username': employee})._id;
+    }
     var startDate = Session.get('startDate');
     var startDate2 = new Date(startDate);
     var startDate3 = startDate2.toLocaleDateString();
-
+    if(employeeID != ''){
+        generalHelpers.makePDF(startDate3,employeeID);
+    }else{
     TimeSheet.find({'startDate': startDate3}).forEach(
         function (sheet) {
-          var userID = sheet.userId;
+            var userID = sheet.userId;
           generalHelpers.makePDF(startDate3, userID);
         }
     );
   }
+}
 });
 
 Template.month_picker.helpers({
