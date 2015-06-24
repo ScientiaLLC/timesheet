@@ -23,8 +23,10 @@ Template.projectInfo.events = {
         var chargeNumber =  $(row).find('#charge_number')[0].value;
         var name = $(row).find('#project_name')[0].value;
         var customer = $(row).find('#customer')[0].value;
-        var startDate = $(row).find('#startDate')[0].value;
-        var endDate = $(row).find('#endDate')[0].value;
+        var categories = $(row).find('#categories')[0].value;
+        var startDate = $(row).find('#start_date')[0].value;
+        var endDate = $(row).find('#end_date')[0].value;
+
         var manager = $(row).find('#manager')[0].value;
 
         var project = ChargeNumbers.findOne({'_id': row.id});
@@ -40,7 +42,8 @@ Template.projectInfo.events = {
                 'endDate': endDate,
                 'is_holiday': project.is_holiday,
                 'indirect': project.indirect,
-                'manager': manager
+                'manager': manager,
+                'categories':categories
             },
             function (){
             $('.toast').addClass('active');
@@ -55,8 +58,10 @@ Template.projectInfo.events = {
         var chargeNumber = $(row).find('#charge_number')[0].value;
         var name = $(row).find('#project_name')[0].value;
         var customer = $(row).find('#customer')[0].value;
-        var startDate = $(row).find('#startDate')[0].value;
-        var endDate = $(row).find('#endDate')[0].value;
+        var categories = $(row).find('#categories')[0].value;
+        var startDate = $(row).find('#start_date')[0].value;
+        var endDate = $(row).find('#end_date')[0].value;
+
         var manager = $(row).find('select')[0].value;
 
         var project = ChargeNumbers.findOne({'_id': row.id});
@@ -70,7 +75,8 @@ Template.projectInfo.events = {
                 'endDate': endDate,
                 'is_holiday': project.is_holiday,
                 'indirect': project.indirect,
-                'manager': manager
+                'manager': manager,
+                'categories':categories
             },
             function (){
             $('.toast').addClass('active');
@@ -92,8 +98,10 @@ Template.projectInfo.events = {
         var chargeNumber = $(row).find('#charge_number')[0].value;
         var name = $(row).find('#project_name')[0].value;
         var customer = $(row).find('#customer')[0].value;
-        var startDate = $(row).find('#startDate')[0].value;
-        var endDate = $(row).find('#endDate')[0].value;
+
+        var categories = $(row).find('#categories')[0].value;
+        var startDate = $(row).find('#start_date')[0].value;
+        var endDate = $(row).find('#end_date')[0].value;
         var manager = $(row).find('#manager')[0].value;
 
         var project = ChargeNumbers.findOne({'_id': row.id});
@@ -106,7 +114,8 @@ Template.projectInfo.events = {
                 'endDate': endDate,
                 'is_holiday': project.is_holiday,
                 'indirect': true,
-                'manager': manager
+                'manager': manager,
+                'categories': categories
         },
             function (){
             $('.toast').addClass('active');
@@ -144,6 +153,7 @@ Template.addProject.events = {
         var endDate = $(row).find('#endDate')[0].value;
         var manager = $(row).find('#manager')[0].value;
         var customer = $(row).find('#customer')[0].value;
+        var categories = $(row).find('#categories')[0].value;
 
         ProjectService.removeErrorClasses(row, ['#charge_number', '#project_name', '#startDate', '#endDate','#manager']);
 
@@ -162,7 +172,8 @@ Template.addProject.events = {
                     'startDate': startDate,
                     'endDate': endDate,
                     'manager': manager,
-                    'indirect': true
+                    'indirect': true,
+                    'categories': categories
             });
             $(row).find('#charge_number')[0].value = '';
             $(row).find('#project_name')[0].value = '';
@@ -170,6 +181,7 @@ Template.addProject.events = {
             $(row).find('#startDate')[0].value = '';
             $(row).find('#endDate')[0].value = '';
             $(row).find('#manager')[0].value = '';
+            $(row).find('#categories')[0].value = '';
         }
         } else {
         if(ProjectService.ensureValidProject(row, chargeNumber, name, customer, startDate, endDate, manager)) {
@@ -180,7 +192,8 @@ Template.addProject.events = {
                 'startDate': startDate,
                 'endDate': endDate,
                 'manager': manager,
-                'indirect': false
+                'indirect': false,
+                'categories': categories
             });
             $(row).find('#charge_number')[0].value = '';
             $(row).find('#project_name')[0].value = '';
@@ -188,6 +201,7 @@ Template.addProject.events = {
             $(row).find('#startDate')[0].value = '';
             $(row).find('#endDate')[0].value = '';
             $(row).find('#manager')[0].value = '';
+            $(row).find('#categories')[0].value = '';
         }
     }
     },
@@ -246,6 +260,7 @@ Template.indirectChargeItems.events({
         var startDate = $(row).find('#startDate')[0].value;
         var endDate = $(row).find('#endDate')[0].value;
         var manager = $(row).find('#manager')[0].value;
+        var categories = $(row).find('#categories')[0].value;
 
         var project = ChargeNumbers.findOne({'_id': _id});
 
@@ -257,7 +272,8 @@ Template.indirectChargeItems.events({
                 'endDate': endDate,
                 'manager': manager,
                 'is_holiday': project.is_holiday,
-                'indirect': project.indirect
+                'indirect': project.indirect,
+                'categories': categories
             },
             function (){
             $('.toast').addClass('active');
@@ -277,6 +293,7 @@ Template.indirectChargeItems.events({
         var startDate = $(row).find('#startDate')[0].value;
         var endDate = $(row).find('#endDate')[0].value;
         var manager = $(row).find('#manager')[0].value;
+        var categories = $(row).find('#categories')[0].value;
 
         var project = ChargeNumbers.findOne({'_id': row.id});
 
@@ -288,7 +305,8 @@ Template.indirectChargeItems.events({
                 'endDate': endDate,
                 'is_holiday': project.is_holiday,
                 'indirect': false,
-                'manager': manager
+                'manager': manager,
+                'categories': categories
         },
             function (){
             $('.toast').addClass('active');

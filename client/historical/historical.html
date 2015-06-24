@@ -25,7 +25,7 @@
       
       <datalist id="employees">
         {{#each auto_employees}}
-        <option id="employeeVal" value="{{name}}">{text}}</option>
+        <option id="employeeVal" value="{{name}}">{{text}}</option>
         {{/each}}
       </datalist>
     </div>
@@ -33,7 +33,7 @@
        <input type="text" id="defaultproject" list="projects" placeholder="Project">
       <datalist id="projects">
         {{#each auto_projects}}
-        <option value="{{name}}">{text}}</option>
+        <option value="{{name}}">{{text}}</option>
         {{/each}}
       </datalist>
     </div>

@@ -433,7 +433,8 @@ Meteor.methods({
      Send the Email
      */
     Email.send({
-      bcc: to, from: 'noreply.scientiallc.timesheet@gmail.com',
+      bcc: to,
+      from: 'noreply.scientiallc.timesheet@gmail.com',
       html: body,
       subject: subject
     });
