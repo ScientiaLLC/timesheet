@@ -27,7 +27,7 @@ ChargeNumbers.allow({
     remove: function(id){
         return true;
     },
-    insert: function(id,name,customer,start_date,end_date,manager,indirect){
+    insert: function(id,name,customer,start_date,end_date,manager,indirect,categories){
         return true;
     }
 });

@@ -10,8 +10,20 @@ Template.associatedProjects.helpers({
   getName: function (id) {
     'use strict';
     var proj = ChargeNumbers.findOne({'_id': id});
+
     return proj.name;
+  },
+  addCategory: function(projectId){
+    var project = ChargeNumbers.findOne({'_id': projectId});
+    var splitByComma = project.categories.split(",");
+    toReturn = [];
+    splitByComma.forEach(function (cat){
+      toReturn.push({category: cat});
+    }); 
+    // console.log(toReturn);
+  return toReturn;
   }
+  
 });
 
 Template.employees_Template.events({
@@ -57,11 +69,11 @@ Template.associatedProjects.events({
     activateInput(tmpl.find("#todo-input"));
   },
 
-  'click .remove': function (evt) {
+  'click #removeUserFromProject': function (evt) {
     'use strict';
     //evt.target.parentNode.style.opacity = 0;
     // wait for CSS animation to finish
-    var userId = String(evt.target.parentNode.parentNode.id);
+    var userId = evt.delegateTarget.firstElementChild.firstElementChild.id;
     Meteor.call('removeEmployeeFromProject', userId, String(this));
   }
 });
