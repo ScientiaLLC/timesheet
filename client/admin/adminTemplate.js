@@ -15,22 +15,39 @@ Template.all_pdfs.helpers({
           text: emp.username
         });
     });
-    console.log(toReturn);
     return toReturn;
+  },
+  auto_projects: function () {
+    'use strict';
+      var toReturn = [];
+       ChargeNumbers.find().fetch().map(function (cn) {
+        toReturn.push({
+          name: cn.name,
+          text: cn.name
+        });
+      });
+  return toReturn;
   }
 });
 Template.all_pdfs.events({
   'click .btn': function () {
     var employee = document.getElementById('defaultemployee').value;
+    var projectName = document.getElementById('defaultproject').value;
     var employeeID = '';
     if(employee){
       employeeID = Meteor.users.findOne({'username': employee})._id;
+    }
+    var projectID = '';
+    if(projectName){
+      projectID = ChargeNumbers.findOne({'name': projectName})._id;
     }
     var startDate = Session.get('startDate');
     var startDate2 = new Date(startDate);
     var startDate3 = startDate2.toLocaleDateString();
     if(employeeID != ''){
         generalHelpers.makePDF(startDate3,employeeID);
+    }else if(projectID != ''){
+        generalHelpers.makePDFfromProjectId(startDate3,projectID);
     }else{
     TimeSheet.find({'startDate': startDate3}).forEach(
         function (sheet) {
