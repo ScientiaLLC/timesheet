@@ -29,6 +29,7 @@
     </div>
     <br>
     {{>employees_Template}}
+    <div class="toast">All changes have been saved...</div>
   </div>
 </template>
 
@@ -76,7 +77,7 @@
         <div>
           <div class="name" id="test">
             {{getName this}}
-            <input id="projectCategories" type="text" placeholder="Catergory" list="{{this}}">
+            <input class="projectCategories" id="projectCategories" type="text" placeholder="Catergory" list="{{this}}">
             <datalist id="{{this}}"> 
               {{#each addCategory this}}
               <option value="{{category}}">{{category}}</option>
