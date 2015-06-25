@@ -58,6 +58,12 @@
       <option id="employeeVal" value="{{name}}">{{text}}</option>
       {{/each}}
     </datalist>
+     <input type="text" id="defaultproject" list="projects" placeholder="Project">
+      <datalist id="projects">
+        {{#each auto_projects}}
+        <option value="{{name}}">{{text}}</option>
+        {{/each}}
+      </datalist>
       
     {{> date_picker}}
     <br>
