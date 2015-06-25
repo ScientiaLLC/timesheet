@@ -326,6 +326,7 @@ Meteor.methods({
       entryArray = [{
         'hours': [Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday],
         'Comment': comment,
+        'category': "",
         'rowID': rowID
       }];
 

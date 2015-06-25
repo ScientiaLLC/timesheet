@@ -18,7 +18,8 @@ Template.activeProjectEntries.helpers({
 });
 
 Template.projectInfo.events = {
-    'blur .charge_number, blur .project_name, change .date, blur .customer': function(event){
+    'blur .charge_number, blur .project_name, change .date, blur .customer, blur .categories': function(event){
+        console.log(event);
         var row = event.currentTarget.parentNode.parentNode;
         var chargeNumber =  $(row).find('#charge_number')[0].value;
         var name = $(row).find('#project_name')[0].value;
@@ -249,7 +250,7 @@ Template.indirectInfo.rendered = function(){
 };
 
 Template.indirectChargeItems.events({
-    'blur .project_name, blur .customer, change .date': function(event){
+    'blur .charge_number, blur .project_name, change .date, blur .customer, blur .categories': function(event){
         var row = event.currentTarget.parentNode.parentNode;
         var name =  $(row).find('#project_name')[0].value;
         var _id=row.id;

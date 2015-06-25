@@ -75,6 +75,57 @@ Template.associatedProjects.events({
     // wait for CSS animation to finish
     var userId = evt.delegateTarget.firstElementChild.firstElementChild.id;
     Meteor.call('removeEmployeeFromProject', userId, String(this));
+  },
+  //adding the category to the projectEntry of the timesheet
+  'blur .projectCategories': function(event){
+    var userId = event.target.parentNode.parentNode.parentNode.id;
+    var category = event.target.value;
+    var projectName = event.target.parentNode.innerText.split(" ")[0];
+    var projectId = ChargeNumbers.findOne({'name': projectName})._id;
+    var toUpdate;
+    var projectEntryArr = [];
+    //used to get timesheet projectEntriesArray and find the correctTimesheet
+    var sheet = TimeSheet.find({'userId': userId, 'active': 1});
+    sheet.forEach(function (e) {
+        if(e.projectEntriesArray.length != 0)
+          projectEntryArr.push(e.projectEntriesArray);
+        e.projectEntriesArray.forEach(function (pe){
+          if(pe.projectId === projectId){
+           toUpdate = e._id;
+        }
+      });
+    });
+    //creates a new projectEntry array to changed with the one Timesheet has
+    var newProjectEntry = [];
+    projectEntryArr.forEach(function(pe){
+      pe.forEach(function(entry){
+        if(entry.projectId === projectId){
+          var project = { 
+            'projectId': projectId,
+             'category': category,
+             'EntryArray': entry.EntryArray
+            }
+            newProjectEntry.push(project);
+      }else{
+        newProjectEntry.push(entry);
+      }
+      });
+      
+    });
+    //updating Timesheet
+    TimeSheet.update({'_id': toUpdate},
+      {
+        $set: {
+          'projectEntriesArray': newProjectEntry
+        }
+      });
+    
+      $('.toast').addClass('active');
+      setTimeout(function () {
+        $('.toast').removeClass('active');
+        }, 5000);
+    
+
   }
 });
 
