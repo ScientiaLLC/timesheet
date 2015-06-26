@@ -77,7 +77,7 @@ Template.associatedProjects.events({
     Meteor.call('removeEmployeeFromProject', userId, String(this));
   },
   //adding the category to the projectEntry of the timesheet
-  'blur .projectCategories': function(event){
+  'blur #projectCategories': function(event){
     var userId = event.target.parentNode.parentNode.parentNode.id;
     var category = event.target.value;
     var projectName = event.target.parentNode.innerText.split(" ")[0];
@@ -110,7 +110,7 @@ Template.associatedProjects.events({
         newProjectEntry.push(entry);
       }
       });
-      
+      console.log(newProjectEntry);
     });
     //updating Timesheet
     TimeSheet.update({'_id': toUpdate},
