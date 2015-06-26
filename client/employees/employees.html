@@ -77,7 +77,7 @@
         <div>
           <div class="name" id="test">
             {{getName this}}
-            <input class="projectCategories" id="projectCategories" type="text" placeholder="Catergory" list="{{this}}">
+            <input id="projectCategories" type="text" placeholder="Catergory" list="{{this}}">
             <datalist id="{{this}}"> 
               {{#each addCategory this}}
               <option value="{{category}}">{{category}}</option>
