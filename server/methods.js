@@ -281,6 +281,7 @@ Meteor.methods({
      This entry corresponds to a single Row on the web page.
      */
     var sheet = TimeSheet.findOne({'startDate': date, 'userId': user});
+    console.log("sheet");
 
     var prEntriesArr = sheet['projectEntriesArray'];
     var entryArrToAdd = null;
@@ -325,6 +326,7 @@ Meteor.methods({
       entryArray = [{
         'hours': [Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday],
         'Comment': comment,
+        'category': "",
         'rowID': rowID
       }];
 
@@ -432,7 +434,8 @@ Meteor.methods({
      Send the Email
      */
     Email.send({
-      bcc: to, from: 'noreply.scientiallc.timesheet@gmail.com',
+      bcc: to,
+      from: 'noreply.scientiallc.timesheet@gmail.com',
       html: body,
       subject: subject
     });

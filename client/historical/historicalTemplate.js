@@ -1,4 +1,4 @@
-Template.PDF.events = {
+(function(){Template.PDF.events = {
   'click button': function (event) {
     var userID = Session.get('LdapId');
     if (Session.get('search_employee')) {
@@ -21,7 +21,9 @@ Template.historyHeader.helpers({
     if (Session.get('search_employee')) {
       userId = Session.get('search_employee');
     }
+    var timesheetProjects = [];
     var timesheets = [];
+    var projectsEntries = [];
     var subordinates = ActiveDBService.getEmployeesUnderManager();
     var sort = {'sort': {'userId': 1, 'startDate': -1}};
 
@@ -31,49 +33,78 @@ Template.historyHeader.helpers({
     managerProjects.forEach(function (p) {
       managerProjIds.push(p.id);
     });
-
+  
+    
     // logger.debug('userId = ' + userId);
     if (userId !== '') {
       TimeSheet.find({
-        'userId': userId, 'projectApprovalArray.projectId': project
+        'userId': userId, 'projectEntriesArray.projectId': project
       }, sort).forEach(
           function (u) {
             // logger.debug('u(userID found) = ' + JSON.stringify(u));
-            timesheetProjects = [];
             u.projectEntriesArray.forEach(function (p) {
-              timesheetProjects.push(p.projectId);
+              if(p.projectId === project){
+                
+                  timesheetProjects.push(p.projectId);
+                              
+                if (findOneInArray(managerProjIds, timesheetProjects)  || u.userId === user._id || user.admin ){//&& !containsInArray(p.projectId, timesheetProjects)) {
+                  timesheets = (ActiveDBService.getTimesheetRowInfo(u, timesheets, p.projectId));
+                }  
+              }  
             });
-            if (findOneInArray(managerProjIds, timesheetProjects) || user.admin) {
-              timesheets = ActiveDBService.getTimesheetRowInfo(u, timesheets);
-            }
           });
     } else {
       TimeSheet.find({
-        'userId': {$in: subordinates}, 'projectApprovalArray.projectId': project
+        'userId': {$in: subordinates}, 'projectEntriesArray.projectId': project
       }, sort).forEach(
           function (u) {
             // logger.debug('u(userID not found) = ' + JSON.stringify(u));
-            timesheetProjects = [];
-            u.projectApprovalArray.forEach(function (p) {
-              timesheetProjects.push(p.projectId);
+            u.projectEntriesArray.forEach(function (p) {
+              
+              if(p.projectId === project){
+                
+                  timesheetProjects.push(p.projectId);
+                              
+                if (findOneInArray(managerProjIds, timesheetProjects)  || u.userId === user._id || user.admin ){//&& !containsInArray(p.projectId, timesheetProjects)) {
+                  timesheets = (ActiveDBService.getTimesheetRowInfo(u, timesheets, p.projectId));
+                }  
+              }  
             });
-            if (findOneInArray(managerProjIds, timesheetProjects) || u.userId === user._id || user.admin) {
-              timesheets = ActiveDBService.getTimesheetRowInfo(u, timesheets);
-            }
-          });
-    }
+            
+        });
+      }
+      
     // logger.debug('timesheets = ' + JSON.stringify(timesheets));
     return timesheets;
+    
   },
 
   getProjects: function () {
     var projects = [];
-    if (Session.get('search_project')) {
-      var project = ChargeNumbers.findOne({'_id': Session.get('search_project')});
-      projects.push(project);
-    } else {
-      projects = ChargeNumbers.find();
-    }
+
+    console.log(Session.get('search_project'));
+    if(Session.get('search_project') == ''){
+      ChargeNumbers.find().forEach(function (p) {
+        TimeSheet.find().forEach(function (timesheets){
+           if(timesheets.projectEntriesArray != null){
+              if(!containsInArray(p, projects)){
+
+              projects.push(p);
+            }
+          }
+        });
+      });
+    }  else if (Session.get('search_project') != null || Session.get('search_project') != '') {
+      ChargeNumbers.find({'name': Session.get('search_project')}).forEach(function (p){
+        TimeSheet.find().forEach(function (timesheets){
+           if(timesheets.projectEntriesArray != null){
+             if(!containsInArray(p, projects)){
+              projects.push(p);
+            }
+          }
+        });
+      });
+    }  
     return projects;
   },
 
@@ -139,27 +170,19 @@ Template.history_month_picker.rendered = function () {
 Template.history_month_picker.helpers({
   currentYear: function () {
     var currentTime;
-    if (Session.get('historyDate') === null) {
-      currentTime = new Date();
-      currentTime.setDate(1);
-      Session.set('historyDate', currentTime);
-    } else {
-      currentTime = Session.get('historyDate');
-    }
+    currentTime = new Date();
+    currentTime.setDate(1);
+    Session.set('historyDate', currentTime);
 
     return currentTime.getFullYear();
   },
 
   currentMonth: function () {
     var currentTime;
-    if (Session.get('historyDate') === null) {
       currentTime = new Date();
       currentTime.setDate(1);
       Session.set('historyDate', currentTime);
-    } else {
-      currentTime = Session.get('historyDate');
-    }
-
+  
     return generalHelpers.getMonthName(currentTime.getMonth());
   }
 });
@@ -536,23 +559,24 @@ Template.historyLog.helpers({
 
 Template.historyEmployeeSelect.events({
   'click button': function (event, template) {
-    var employee = template.find('#employeeSearch').value;
+    var employee = document.getElementById('defaultemployee').value;
 
     var employeeID = '';
     var employees = Meteor.users.find({'username': employee});
+
     employees.forEach(function (e) {
       employeeID = e._id;
     });
-
-    var project = template.find('#projectSearch').value;
-    if (project !== '') {
-      project = project.split(' - ')[1];
-    }
+   
+    var project = document.getElementById('defaultproject').value;
+    console.log()
     var projectId = '';
-    var projects = ChargeNumbers.find({'name': project});
-    projects.forEach(function (p) {
-      projectId = p.id;
-    });
+    if(project != ''){
+       var projects = ChargeNumbers.find({'name': project});
+       projects.forEach(function (p) {
+        projectId = p.name;
+     });
+    }
 
     var user = Meteor.users.findOne({'_id': Session.get('LdapId')});
 
@@ -566,9 +590,13 @@ Template.historyEmployeeSelect.events({
         Session.set('search_employee', '');
       }
     }
-
+    console.log(projectId);
     Session.set('search_project', projectId);
+    console.log(Session.get('search_project'));
     Session.set('current_page', 'historical_page');
+  },
+  'click #showall': function (event, template){
+    console.log("showall");
   }
 });
 
@@ -578,27 +606,41 @@ Template.historyEmployeeSelect.rendered = function () {
 };
 
 Template.historyEmployeeSelect.helpers({
-  auto_projects: function () {
+   auto_projects: function () {
     'use strict';
+    var toReturn = [];
     var person = Meteor.users.findOne({'_id': Session.get('LdapId')});
     if (person === null || (!person.manager && !person.admin)) {
       return;
     }
 
     if (person.admin) {
-      return ChargeNumbers.find().fetch().map(function (cn) {
-        return '' + cn.id + ' - ' + cn.name;
+       ChargeNumbers.find().fetch().map(function (cn) {
+        toReturn.push({
+          name: cn.name,
+          text: cn.name
+        });
       });
-    }
-    return ChargeNumbers.find({'manager': {$in: person.groups}}).fetch().map(function (cn) {
-      return '' + cn.id + ' - ' + cn.name;
-    });
+    } else{
+      ChargeNumbers.find({'manager': {$in: person.groups}}).fetch().map(function (cn) {
+        toReturn.push({
+            name: cn.name,
+            text: cn.name
+          });
+      });
+  }
+  return toReturn;
   },
 
   auto_employees: function () {
-    return Meteor.users.find().fetch().map(function (emp) {
-      return emp.username;
+    var toReturn = []; 
+    Meteor.users.find().fetch().map(function (emp) {
+        toReturn.push({
+          name: emp.username,
+          text: emp.username
+        });
     });
+    return toReturn;
   }
 });
 
@@ -664,3 +706,13 @@ Template.historical_totals.helpers({
     return total;
   }
 });
+
+var containsInArray = function(item, array){
+    for(var i =0; i<array.length;i++){
+      if(item === array[i]){
+        return true;
+      }
+    }
+    return false;
+}
+})();

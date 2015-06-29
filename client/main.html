@@ -29,40 +29,39 @@
       </div>
     </div>
   </nav>
-  {{> mainSelector}}
+  <!-- {{> mainSelector}} -->
 </div>
 </body>
 
 <template name="pages">
-  {{#unless isLoginPage}}
-    <ul class="navbar nav-pills navbar-nav navbar-left ">
-      <li role="presentation" class="{{#if isTimesheet}}active{{/if}} tag"
-          id='time_sheet'>
-        Time Sheet
-      </li>
-      <li id='historical_page' class="{{#if isHistorical}}active{{/if}} tag">
-        Historical
-      </li>
-      {{#if isManager}}
-        <li id='approval_page' class="tag {{#if isApproval}}active{{/if}}">
-          Approval
-        </li>
-      {{/if}}
-      {{#if isAdmin}}
-
-        <li id='active_projects'
-            class="tag {{#if isActiveProjects}}active{{/if}}">
-          Projects
-        </li>
-        <li id='employees_settings'
-            class="tag {{#if isEmployeeSettings}}active{{/if}}">
-          Employees
-        </li>
-        <li id='admin_page' class="tag {{#if isAdminPage}}active{{/if}}">
-          Admin
-        </li>
-      {{/if}}
-    </ul>
+    {{#if isLogin}}
+        <ul class="navbar nav-pills navbar-nav navbar-left ">
+            <div class="small-2 columns">
+                <a href="{{ pathFor 'SelectedTimesheet'}}"> 
+                    <li class="tag" role="presentation">Timesheet</li>
+                </a>
+                <a href="{{ pathFor 'historicalPage'}}"> 
+                    <li class="tag" role="presentation">Historical</li>
+                </a>
+                {{#if isManager}}
+                  <a href="{{ pathFor 'approvalPage'}}"> 
+                    <li class="tag" role="presentation">Approval</li>
+                  </a>
+                {{/if}}
+                {{#if isAdmin}}
+                  <a href="{{ pathFor 'activeProjects'}}"> 
+                    <li class="tag" role="presentation">Projects</li>
+                  </a>
+                  <a href="{{ pathFor 'employeeSettings'}}"> 
+                    <li class="tag" role="presentation">Employees</li>
+                  </a>
+                  <a href="{{ pathFor 'adminPage'}}"> 
+                   <li class="tag" role="presentation">Admin</li>
+                  </a>
+                {{/if}}
+            </div>
+        </ul>
+    {{/if}}
     {{#if displayLoginDropdown}}
       <ul class="nav navbar-nav navbar-right">
         <li>
@@ -72,13 +71,12 @@
               {{getUsername}} <span class="caret"></span>
             </div>
             <ul class="dropdown-menu" role="menu">
-              <li><a href=".">Logout</a></li>
+              <li><a href="{{pathFor 'logout'}}">Logout</a></li>
             </ul>
           </div>
         </li>
       </ul>
     {{/if}}
-  {{/unless}}
 </template>
 
 <template name="loginPage">
@@ -111,35 +109,3 @@
   {{LoginFailed}}
 </template>
 
-<template name="mainSelector">
-  {{#if isLoginPage}}
-    {{> loginPage}}
-  {{/if}}
-  {{#if isTimesheet}}
-    {{> activeTimesheets}}
-  {{/if}}
-  {{#if isHistorical}}
-    {{> historicalPage}}
-  {{/if}}
-  {{#if isActiveProjects}}
-    {{> activeProjects}}
-  {{/if}}
-  {{#if isArchivedProjects}}
-    {{> archivedProjects}}
-  {{/if}}
-  {{#if isEmployeeSettings}}
-    {{> employeeSettings}}
-  {{/if}}
-  {{#if isSelectedTimesheet}}
-    {{> SelectedTimesheet}}
-  {{/if}}
-  {{#if isHistoricalTimesheet}}
-    {{> SelectedHistoryTimesheet}}
-  {{/if}}
-  {{#if isApproval}}
-    {{> approvalPage}}
-  {{/if}}
-  {{#if isAdminPage}}
-    {{> adminPage}}
-  {{/if}}
-</template>

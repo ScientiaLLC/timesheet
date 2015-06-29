@@ -52,6 +52,19 @@
   <h2>Weekly Timesheets to PDF</h2>
 
   <div class="container-fluid">
+    <input name="employees" type="text" id="defaultemployee" list="employees" placeholder="Username">
+    <datalist id="employees">
+      {{#each auto_employees}}
+      <option id="employeeVal" value="{{name}}">{{text}}</option>
+      {{/each}}
+    </datalist>
+     <input type="text" id="defaultproject" list="projects" placeholder="Project">
+      <datalist id="projects">
+        {{#each auto_projects}}
+        <option value="{{name}}">{{text}}</option>
+        {{/each}}
+      </datalist>
+      
     {{> date_picker}}
     <br>
     &nbsp;

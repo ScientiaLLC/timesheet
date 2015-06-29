@@ -29,6 +29,7 @@
     </div>
     <br>
     {{>employees_Template}}
+    <div class="toast">All changes have been saved...</div>
   </div>
 </template>
 
@@ -73,26 +74,23 @@
   <li class="todo {{doneClass}}">
     <div class="item-tags" id="{{_id}}">
       {{#each projects}}
-        <div class="tag removable_tag label">
-          <div class="name" id="test">{{getName this}}</div>
+        <div>
+          <div class="name" id="test">
+            {{getName this}}
+            <input id="projectCategories" type="text" placeholder="Catergory" list="{{this}}">
+            <datalist id="{{this}}"> 
+              {{#each addCategory this}}
+              <option value="{{category}}">{{category}}</option>
+              {{/each}}
+            </datalist>
+            <button id="removeUserFromProject" class="btn btn-success">Remove</button>
+          </div>
           <div class="remove"></div>
         </div>
       {{/each}}
-        <!-- {{#if addingTag}}
-              <div class="tag edittag">
-                  <select id="edittag-input" class="form-control">
-                    {{#each chargeNumbers}}
-      {{#if isActive endDate}}
-                          <option value="{{id}}">{{text}}</option>
-                      {{/if}}
-    {{/each}}
-                  </select>
-              </div>
-          {{else}} -->
       <div class="tag addtag">
         +Project
       </div>
-        <!-- {{/if}} -->
     </div>
   </li>
 </template>
