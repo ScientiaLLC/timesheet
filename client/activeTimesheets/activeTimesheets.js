@@ -1151,6 +1151,7 @@ Template.projectHours.events = {
     // I added this so we can retrieve the selected project's ID so we can add it to the Database
     var projectIndex = $(row).find('#project_select')[0].selectedIndex;
     var projectId = $(row).find('#project_select')[0].children[projectIndex].id;
+    console.log(projectId);
 
     Session.get("max_Row");
     var rowID = Session.get("max_Row") + 1;
@@ -1179,8 +1180,9 @@ Template.projectHours.events = {
       var sheet = TimeSheet.findOne({'startDate': date, 'userId': user});
 
       var data = Session.get('editing-user-page');
-
+      console.log("here");
       if (!sheet['submitted'] || TimeSheetService.checkSentBack() || data) {
+        console.log("in if");
         Meteor.call('addRowToTimeSheet', Session.get("startDate"), user, projectId,
             comment_t,
             sunday_t,

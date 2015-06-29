@@ -2,6 +2,9 @@
  * Created by sternetj on 12/7/14.
  */
 Session.set('current_project_to_approve', 'none');
+Session.set('current_user', 'admin');
+
+Session.set('showZeroHours',false);
 var days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Next Week Goals",
   "Issues", "Concerns", "General Comment"];
 
@@ -23,6 +26,9 @@ Template.toApprove_Template.helpers({
     var totals = {};
     var hasSubmitted = {};
 
+    var zeroEntry = [];
+    var userIdToSubmit = [];
+    var total = 0;
     var startDateStr = Session.get("startDate");
     var startDate = new Date(startDateStr);
     //get timesheets for the selected startdate
@@ -33,17 +39,21 @@ Template.toApprove_Template.helpers({
     var toReturn = [];
 
     timesheets.forEach(function (t) {
+      // console.log(t);
       var pApprovals = {};
       for (var i in t.projectApprovalArray) {
         pApprovals[t.projectApprovalArray[i].projectId] = t.projectApprovalArray[i].approved;
       }
 
       t.projectEntriesArray.forEach(function (pe) {
-        var total = 0;
         if (pe.projectId == selected && (!pApprovals[pe.projectId] || Session.get('showAll'))) {
           pe.EntryArray.forEach(function (a) {
             for (var b in a.hours) {
               total += parseFloat(a.hours[b]);
+              // console.log("total " +total);
+            }
+            if(total === 0 ){
+              zeroEntry.push(pe.projectId);
             }
           });
         }
@@ -65,13 +75,18 @@ Template.toApprove_Template.helpers({
               approved: !show
             };
           }
-          totals[t.userId] =
-          {
-            total: totals[t.userId].total + total,
-            sentBack: totals[t.userId].sentBack || (rejected && pe.projectId == selected) || !t.submitted,
-            approved: totals[t.userId].approved || (pApprovals[pe.projectId] && pe.projectId == selected)
-          };
+          if(!containsInArray(pe.projectId,zeroEntry) || Session.get('showZeroHours')){
+            
+            totals[t.userId] =
+            {
+              total: totals[t.userId].total + total,
+              sentBack: totals[t.userId].sentBack || (rejected && pe.projectId == selected) || !t.submitted,
+              approved: totals[t.userId].approved || (pApprovals[pe.projectId] && pe.projectId == selected)
+            };
+            // console.log(totals[t.userId].total);
+          }
         }
+        total =0;
       });
       hasSubmitted[t.userId] = t.submitted;
       if (totals[t.userId] == null) {
@@ -93,18 +108,19 @@ Template.toApprove_Template.helpers({
         }
       }
     });
-
     for (var key in totals) {
       if (totals.hasOwnProperty(key) && (!totals[key].approved || Session.get('showAll'))) {
         var u = Meteor.users.findOne({_id: key});
-        toReturn.push({
-          selected: '',
-          submitted: hasSubmitted[key],
-          sentBack: totals[key].sentBack,
-          username: u.username,
-          total: totals[key].total,
-          color2: totals[key].approved ? "color:#5CB85C" : ""
-        });
+        if(totals[key].total != 0 || Session.get('showZeroHours')){
+          toReturn.push({
+            selected: '',
+            submitted: hasSubmitted[key],
+            sentBack: totals[key].sentBack,
+            username: u.username,
+            total: totals[key].total,
+            color2: totals[key].approved ? "color:#5CB85C" : ""
+          });
+        }
       }
     }
 
@@ -130,9 +146,148 @@ Template.toApprove_Template.helpers({
       toReturn[0].selected = 'selected';
       Session.set('current_user_to_approve', toReturn[0].username);
     }
-
     return toReturn;
   }
+});
+Template.toApprove_Users.helpers({
+  showUserHours: function(){
+    var selected = Session.get('current_user');
+    var projectId = '';
+    // console.log("selected"+selected);
+    var totals = {};
+    var hasSubmitted = {};
+    var userID = Meteor.users.findOne({'username': selected})._id;
+    // console.log(userId);
+    var total = 0;
+    var projectHoursArray = [];
+    var startDateStr = Session.get("startDate");
+    var startDate = new Date(startDateStr);
+    //get timesheets for the selected startdate
+    var timesheets = TimeSheet.find({
+      'startDate': startDate.toLocaleDateString()
+    });
+
+    var toReturn = [];
+
+    timesheets.forEach(function (t) {
+      var pApprovals = {};
+      // console.log(t);
+        // var usernameId = t
+        for (var i in t.projectApprovalArray) {
+          pApprovals[t.projectApprovalArray[i].projectId] = t.projectApprovalArray[i].approved;
+        }
+
+
+      t.projectEntriesArray.forEach(function (pe) {
+        projectId = pe.projectId;
+        // console.log("pe");
+        // console.log(pe);
+        // console.log("projectID "+projectId);
+        if (!pApprovals[pe.projectId]) {
+         Session.set('current_user_project_to_approve', pe.projectId);
+          pe.EntryArray.forEach(function (a) {
+
+            for (var b in a.hours) {
+              total += parseFloat(a.hours[b]);
+            }
+          });
+        }
+
+        var rejected = false;
+        t.projectApprovalArray.forEach(function (paa) {
+            if (paa.projectId == projectId) {
+            show = (!paa.approved || Session.get('showAll'));
+            rejected = paa.sentBack;
+          }
+        });
+
+        if (show) {
+          if (!totals[projectId]) {
+            totals[projectId] = {
+              total: 0,
+              sentBack: rejected,
+              approved: !show
+            };
+          }
+          if(userID === t.userId){
+          totals[projectId] =
+          {
+            total: totals[projectId].total + total,
+            sentBack: totals[projectId].sentBack || (rejected || !t.submitted),
+            approved: totals[projectId].approved || (pApprovals[pe.projectId])
+          };
+        }
+      }
+        if(userID === t.userId){
+          projectHoursArray.push(projectId);
+        }
+        total =0;
+        
+      });
+      // console.log(projectHoursArray);
+      hasSubmitted[t.userId] = t.submitted;
+      if (totals[t.userId] == null) {
+        var show = true;
+        t.projectApprovalArray.forEach(function (paa) {
+          if (paa.projectId == selected) {
+            show = (!paa.approved || Session.get('showAll'));
+          }
+        });
+        if (Meteor.users.findOne({
+              _id: userID,
+              projects: {$in: [projectId]}
+            }) && show) {
+          totals[t.userId] = {
+            total: 0,
+            sentBack: !t.submitted,
+            approved: !show
+          };
+        }
+      }
+    });
+  // console.log(totals);
+    for (var key in totals) {
+      if (totals.hasOwnProperty(key) && (!totals[key].approved || Session.get('showAll'))) {
+        var u = Meteor.users.findOne({_id: userID});
+          if(containsInArray(key,projectHoursArray)){
+            toReturn.push({
+              selected: 'selected',
+              submitted: hasSubmitted[key],
+              sentBack: totals[key].sentBack,
+              username: ChargeNumbers.findOne({'_id': key}).name,
+              total: totals[key].total,
+              color2: totals[key].approved ? "color:#5CB85C" : ""
+            });
+          }
+        }
+      }
+
+    var compare = function (a, b) {
+      if (a.submitted > b.submitted) {
+        return -1;
+      } else if (a.submitted == b.submitted) {
+        if (a.sentBack > b.sentBack) {
+          return 1;
+        } else if (a.sentBack < b.sentBack) {
+          return -1;
+        } else {
+          return 0;
+        }
+      }
+
+      return 1;
+    };
+
+    toReturn = toReturn.sort(compare);
+
+    // if (toReturn[0]) {
+    //   toReturn[0].selected = 'selected';
+    //   Session.set('current_user', toReturn[0].username);
+    // }
+    // console.log("toReturn");
+    // console.log(toReturn);
+    return toReturn;
+  },
 });
 
 Template.toApprove_Template.events({
@@ -247,7 +402,25 @@ ApprovalService = {
 
 Template.approval_Template.helpers({
   Active: function () {
+    // var user = Session.get('current_user');
     var username = Session.get('current_user_to_approve');
+    var startDate = new Date(Session.get("startDate"));
+
+    if (!username) {
+      return false;
+    }
+    var userId = Meteor.users.findOne({username: username})._id;
+    var sheet = TimeSheet.findOne({
+      'startDate': startDate.toLocaleDateString(),
+      'userId': userId
+    });
+    return (sheet.active == 1);
+
+  },
+  Active_user: function () {
+    var username = Session.get('current_user');
+    var projectName = Session.get('current_user_project_to_approve');
+
     var startDate = new Date(Session.get("startDate"));
     if (!username) {
       return false;
@@ -290,7 +463,9 @@ Template.approval_Template.helpers({
     var id = null;
     if (user.admin) {
       id = ChargeNumbers.findOne()._id;
+      // console.log(Session.get('current_project_to_approve'));
       Session.set('current_project_to_approve', id);
+       // console.log(Session.get('current_project_to_approve'));
       ChargeNumbers.find({}).forEach(function (cn) {
         if (cn.indirect) {
           toReturn.push({
@@ -338,6 +513,16 @@ Template.approval_Template.helpers({
 
     return toReturn;
   },
+  'managedUser': function(){
+    var toReturn = []; 
+    Meteor.users.find().fetch().map(function (emp) {
+        toReturn.push({
+          name: emp.username,
+          text: emp.username
+        });
+    });
+    return toReturn;
+  },
   isActive: function (date) {
     "use strict";
     return ProjectService.isActive(date);
@@ -346,12 +531,92 @@ Template.approval_Template.helpers({
     var chargeNumber_id = Session.get('current_project_to_approve');
     var username = Session.get('current_user_to_approve');
     if (!username) return;
-    var userId = Meteor.users.findOne({username: username})._id;
+    // var userId = Meteor.users.findOne({'username': username})._id;
 
     var startDateStr = Session.get("startDate");
     var startDate = new Date(startDateStr);
     var timesheets = TimeSheet.find({
-      'userId': userId,
+      'userId': Meteor.users.findOne({'username': username})._id,
+      'startDate': startDate.toLocaleDateString()
+    });
+
+    var toReturn = [];
+
+    timesheets.forEach(function (t) {
+      var pApprovals = {};
+      for (var i in t.projectApprovalArray) {
+        pApprovals[t.projectApprovalArray[i].projectId] = t.projectApprovalArray[i].approved;
+      }
+
+      t.projectEntriesArray.forEach(function (pe) {
+        if (pe.projectId === chargeNumber_id && (!pApprovals[pe.projectId] || Session.get('showAll'))) {
+          pe.EntryArray.forEach(function (a) {
+            for (var b in a.hours) {
+              if (!toReturn[b]) {
+                toReturn[b] = {
+                  day: days[b],
+                  hours: parseFloat(a.hours[b]),
+                  comment: [{com: a.hours[b] > 0 ? a.Comment : ""}]
+                }
+                continue;
+              }
+              if (a.hours[b] > 0) {
+                toReturn[b].comment.push({com: a.Comment});
+                toReturn[b] = {
+                  day: toReturn[b].day,
+                  hours: toReturn[b].hours + parseFloat(a.hours[b]),
+                  comment: toReturn[b].comment
+                };
+              }
+            }
+          });
+          toReturn[7] = {
+            day: "Next Week Goals",
+            hours: "",
+            comment: [{com: pe.next}]
+          }
+          toReturn[8] = {
+            day: "Issues",
+            hours: "",
+            comment: [{com: pe.issues}]
+          };
+          toReturn[9] = {
+            day: "Concerns",
+            hours: "",
+            comment: [{com: t.concerns}]
+          };
+          toReturn[10] = {
+            day: "General Comment",
+            hours: "",
+            comment: [{com: t.generalComment}]
+          };
+        }
+      });
+      if (toReturn.length === 0) {
+        for (var i = 0; i < 11; i++) {
+          toReturn[i] = {
+            day: days[i],
+            hours: (i > 6 ? '' : 0),
+            comment: ''
+          };
+        }
+      }
+    });
+
+    return toReturn;
+  },
+  userSearchTimesheet: function () {
+    var chargeNumber_name = Session.get('current_user_project_to_approve');
+    var chargeNumber_id = ChargeNumbers.findOne({'name': chargeNumber_name})._id;
+    // Session.set('current_user_project_to_approve', chargeNumber_id);
+    var username = Session.get('current_user');
+    if (!username) return;
+    // var userId = Meteor.users.findOne({'username': username})._id;
+
+    var startDateStr = Session.get("startDate");
+    var startDate = new Date(startDateStr);
+    var timesheets = TimeSheet.find({
+      'userId': Meteor.users.findOne({'username': username})._id,
       'startDate': startDate.toLocaleDateString()
     });
 
@@ -433,6 +698,7 @@ Template.approval_Template.helpers({
 Template.approval_Template.events({
   'onload #timesheet_approvals': function (e) {
     lastSelection = document.getElementById("timesheet_approvals");
+    // console.log(lastSelection);
   },
   'change [type=current-project-checkbox]': function (e, t) {
     "use strict";
@@ -448,8 +714,17 @@ Template.approval_Template.events({
       lastSelection.classList.add("selected");
     }
   },
+  'change [type=current-user-checkbox]': function(e,t){
+    "use strict";
+    var str = e.target.options[e.target.selectedIndex].value;
+    // console.log(str);
+    Session.set('current_user', str);
+
+  },
   'click .row-item': function (e, t) {
+    // console.log(e);
     lastSelection = document.getElementsByClassName("selected toApprove-Rows")[0];
+    // console.log(lastSelection);
     if (lastSelection) {
       lastSelection.classList.remove("selected");
     }
@@ -459,12 +734,17 @@ Template.approval_Template.events({
       lastSelection = lastSelection.parentNode;
     }
     lastSelection.classList.add("selected");
-
+    // console.log(lastSelection.childNodes[2].id);
     if (lastSelection.childNodes[2].id === 'username') {
       Session.set('current_user_to_approve', lastSelection.childNodes[2].firstChild.textContent);
-    } else {
+    } else if(lastSelection.childNodes[2].id === ''){
+      // sometimes the passes in tag is null when it should be username.
       Session.set('current_user_to_approve', lastSelection.childNodes[2].childNodes[1].childNodes[3].childNodes[1].textContent);
-    }
+    }else if(lastSelection.childNodes[2].id === 'project'){
+      // Session.set('current_user_to_approve', lastSelection.childNodes[2].childNodes[1].childNodes[3].childNodes[1].textContent);
+      Session.set('current_user_project_to_approve', lastSelection.childNodes[2].firstChild.textContent);
+    } 
+
   },
   'click .edit-sheet': function () {
     var username = Session.get('current_user_to_approve');
@@ -485,7 +765,7 @@ Template.approval_Template.events({
   },
   'click #showbtn': function (e) {
     if (Session.get('showAll') == null) {
-      Session.set('showAll', true);
+      Session.set('showAll', false);
       e.target.innerHTML = "Hide Approved Time";
     }
     Session.set('showAll', !Session.get('showAll'));
@@ -495,8 +775,21 @@ Template.approval_Template.events({
     } else {
       e.target.innerHTML = "Show Approved Time";
     }
+  },
+  'click #showAll': function (e) {
+    if (Session.get('showZeroHours') == null) {
+      Session.set('showZeroHours', false);
+      e.target.innerHTML = "Hide Zero Hours";
+    }
+    Session.set('showZeroHours', !Session.get('showZeroHours'));
 
+    if (Session.get('showZeroHours')) {
+      e.target.innerHTML = "Hide Zero Hours";
+    } else {
+      e.target.innerHTML = "Show Zero Hours";
+    }
   }
+  
 });
 
 Template.date_picker.helpers({
@@ -553,3 +846,11 @@ Template.date_picker.events({
     //Session.set("startDate", d2.toISOString());
   }
 })
+var containsInArray = function(item, array){
+    for(var i =0; i<array.length;i++){
+      if(item === array[i]){
+        return true;
+      }
+    }
+    return false;
+}
