@@ -37,45 +37,46 @@
     {{#if isLogin}}
         <ul class="navbar nav-pills navbar-nav navbar-left ">
             <div class="small-2 columns">
-               <a href="{{ pathFor 'SelectedTimesheet'}}"> 
+                <a href="{{ pathFor 'SelectedTimesheet'}}"> 
                     <li class="tag" role="presentation">Timesheet</li>
-               </a>
-               <a href="{{ pathFor 'historicalPage'}}"> 
+                </a>
+                <a href="{{ pathFor 'historicalPage'}}"> 
                     <li class="tag" role="presentation">Historical</li>
-               </a>
-               {{#if isManager}}
-               <a href="{{ pathFor 'approvalPage'}}"> 
-                   <li class="tag" role="presentation">Approval</li>
-               </a>
-               {{/if}}
+                </a>
+                {{#if isManager}}
+                  <a href="{{ pathFor 'approvalPage'}}"> 
+                    <li class="tag" role="presentation">Approval</li>
+                  </a>
+                {{/if}}
                 {{#if isAdmin}}
-               <a href="{{ pathFor 'activeProjects'}}"> 
+                  <a href="{{ pathFor 'activeProjects'}}"> 
                     <li class="tag" role="presentation">Projects</li>
-               </a>
-               <a href="{{ pathFor 'employeeSettings'}}"> 
+                  </a>
+                  <a href="{{ pathFor 'employeeSettings'}}"> 
                     <li class="tag" role="presentation">Employees</li>
-               </a>
-               <a href="{{ pathFor 'adminPage'}}"> 
+                  </a>
+                  <a href="{{ pathFor 'adminPage'}}"> 
                    <li class="tag" role="presentation">Admin</li>
-               </a>
-               {{/if}}
-
+                  </a>
+                {{/if}}
             </div>
         </ul>
-    <ul class="nav navbar-nav navbar-right">
-      <li>
-        <div class="btn-group" id="login_info">
-          <div class="btn-lg dropdown-toggle" data-toggle="dropdown"
-               aria-expanded="false">
-            {{getUsername}} <span class="caret"></span>
+    {{/if}}
+    {{#if displayLoginDropdown}}
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+          <div class="btn-group" id="login_info">
+            <div class="btn-lg dropdown-toggle" data-toggle="dropdown"
+                 aria-expanded="false">
+              {{getUsername}} <span class="caret"></span>
+            </div>
+            <ul class="dropdown-menu" role="menu">
+              <li><a href="{{pathFor 'logout'}}">Logout</a></li>
+            </ul>
           </div>
-          <ul class="dropdown-menu" role="menu">
-            <li><a href="{{pathFor 'logout'}}">Logout</a></li>
-          </ul>
-        </div>
-      </li>
-    </ul>
-  {{/if}}
+        </li>
+      </ul>
+    {{/if}}
 </template>
 
 <template name="loginPage">

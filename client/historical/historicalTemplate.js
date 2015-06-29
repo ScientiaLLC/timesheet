@@ -1,4 +1,4 @@
-Template.PDF.events = {
+(function(){Template.PDF.events = {
   'click button': function (event) {
     var userID = Session.get('LdapId');
     if (Session.get('search_employee')) {
@@ -81,21 +81,24 @@ Template.historyHeader.helpers({
 
   getProjects: function () {
     var projects = [];
-    if (Session.get('search_project') != null) {
-      var project = ChargeNumbers.findOne({'name': Session.get('search_project')}).forEach(function (p){
+
+    console.log(Session.get('search_project'));
+    if(Session.get('search_project') == ''){
+      ChargeNumbers.find().forEach(function (p) {
         TimeSheet.find().forEach(function (timesheets){
            if(timesheets.projectEntriesArray != null){
-             if(!containsInArray(p, projects)){
+              if(!containsInArray(p, projects)){
+
               projects.push(p);
             }
           }
         });
       });
-    } else {
-      var project = ChargeNumbers.find().forEach(function (p) {
+    }  else if (Session.get('search_project') != null || Session.get('search_project') != '') {
+      ChargeNumbers.find({'name': Session.get('search_project')}).forEach(function (p){
         TimeSheet.find().forEach(function (timesheets){
            if(timesheets.projectEntriesArray != null){
-              if(!containsInArray(p, projects)){
+             if(!containsInArray(p, projects)){
               projects.push(p);
             }
           }
@@ -568,10 +571,12 @@ Template.historyEmployeeSelect.events({
     var project = document.getElementById('defaultproject').value;
     console.log()
     var projectId = '';
-    var projects = ChargeNumbers.find({'name': project});
-    projects.forEach(function (p) {
-      projectId = p.name;
-    });
+    if(project != ''){
+       var projects = ChargeNumbers.find({'name': project});
+       projects.forEach(function (p) {
+        projectId = p.name;
+     });
+    }
 
     var user = Meteor.users.findOne({'_id': Session.get('LdapId')});
 
@@ -587,7 +592,11 @@ Template.historyEmployeeSelect.events({
     }
     console.log(projectId);
     Session.set('search_project', projectId);
+    console.log(Session.get('search_project'));
     Session.set('current_page', 'historical_page');
+  },
+  'click #showall': function (event, template){
+    console.log("showall");
   }
 });
 
@@ -705,3 +714,4 @@ var containsInArray = function(item, array){
     }
     return false;
 }
+

@@ -654,7 +654,7 @@ Meteor.methods({
       }
     }
 
-    var newRevision = sheet.revision
+    var newRevision = sheet.revision;
     if (revision) {
       // set to new revision if present
       newRevision = revision;
@@ -673,8 +673,8 @@ Meteor.methods({
 
   },
   addNewProject: function (project) {
-    var startDate = new Date(project.start_date)
-    var endDate = new Date(project.end_date)
+    var startDate = new Date(project.startDate);
+    var endDate = new Date(project.endDate);
     if (startDate > endDate) {
       //startDate is after endDate
       return;

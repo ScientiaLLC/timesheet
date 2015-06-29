@@ -1,14 +1,4 @@
-ChargeNumbers = new Meteor.Collection('charge_numbers');
-Employees = new Meteor.Collection('employees');
-TimeSheet = new Meteor.Collection('time_sheets');
-Jobs = new Meteor.Collection('jobs');
-
-Deps.autorun(function () {
-  Meteor.subscribe('userData');
-  Meteor.subscribe('projects');
-  Meteor.subscribe('timesheet');
-  Meteor.subscribe('serverjobs');
-});
+logger.debug('loading client/main.js');
 
 Accounts.ui.config({
   passwordSignupFields: 'USERNAME_ONLY'
@@ -16,6 +6,7 @@ Accounts.ui.config({
 
 headers.ready(function () {
   var user = headers.get('x-forwarded-user');
+  logger.debug('client/main.js: x-forwarded-user = ' + user);
   if (!user) {
     Session.setDefault('current_page', 'login_page');
   } else {
@@ -40,7 +31,7 @@ Template.pages.events({
       var callback = function (error, data) {
         Session.set('current_page', 'selected_timesheet');
         var date = (data.start.getMonth() + 1) + '/' + data.start.getDate() + '/' + data.start.getFullYear();
-        console.log(date);
+        logger.debug('start date = ' + date);
         Session.set('startDate', date);
 
       };
@@ -77,18 +68,29 @@ Template.pages.helpers({
         }
         return user.manager;
     },
-    isAdmin: function () {
-        var id = Session.get('LdapId');
-        if (!id){
-            return;
-        }
-        var user = Meteor.users.findOne({_id: id});
-        if (!user){
-            return false;
-        }
-        return user.admin;
-    }
 
+  isAdmin: function () {
+    var id = Session.get('LdapId');
+    if (!id) {
+      return;
+    }
+    var user = Meteor.users.findOne({_id: id});
+    if (!user) {
+      return false;
+    }
+    return user.admin;
+  },
+
+  displayLoginDropdown: function () {
+    headers.ready(function () {
+      var user = headers.get('x-forwarded-user');
+      if (user) {
+        return false;
+      } else {
+        return true;
+      }
+    });
+  }
 });
 
 

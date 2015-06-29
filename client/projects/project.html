@@ -23,7 +23,7 @@
 <template name="activeProjectEntries">
     {{> projectHeader}}
     {{#each projects}}
-        {{#if isActive end_date}}
+        {{#if isActive endDate}}
             {{> projectInfo}}
         {{/if}}
     {{/each}}
@@ -74,7 +74,7 @@
 <template name="archivedProjectsEntries">
     {{> projectHeaderArchive}}
     {{#each projects}}
-        {{#if isArchived end_date}}
+        {{#if isArchived endDate}}
             {{> projectInfo}}
         {{/if}}
     {{/each}}
@@ -109,7 +109,7 @@
 <template name="indirectChargeItems">
     {{> indirectHeader}}
     {{#each projects}}
-        {{#if isActive end_date}}
+        {{#if isActive endDate}}
             {{> indirectInfo}}
          {{/if}}
     {{/each}}

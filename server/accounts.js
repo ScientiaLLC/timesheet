@@ -14,6 +14,8 @@ var ldapSearchResult = [];
 var wrappedLdapBind = Meteor.wrapAsync(LDAP.client.bind, LDAP.client);
 // the search method still requires a callback because it is an event-emitter
 LDAP.asyncSearch = function (binddn, opts, callback) {
+  logger.debug('server/accounts.js: asyncSearch: binddn = ' + binddn +
+      ', opts = ' + JSON.stringify(opts, null, 4));
   LDAP.client.search(binddn, opts, function (err, search) {
     if (err) {
       callback(false);
@@ -53,20 +55,23 @@ LDAP.search = function (username) {
 
 LDAP.getGroupList = function (isAdminList) {
   var opts;
-  var filterStr = '';
   if (isAdminList) {
+    logger.debug('server/accounts.js: getGroupList: getting admin list');
     opts = {
       filter: '(cn=' + Meteor.settings.ldap_admin + ')',
       scope: 'sub',
       attributes: ['member']  // add more ldap search attributes here when needed
     };
   } else {
+    logger.debug('server/accounts.js: getGroupList: getting manager list');
+    var filterStr = null;
     ChargeNumbers.find({}).forEach(function (cn) {
-      var sDate = new Date(cn.start_date);
-      var eDate = new Date(cn.end_date);
+      logger.debug('server/accounts.js: getGroupList: cn = ' + JSON.stringify(cn, null, 4));
+      var sDate = new Date(cn.startDate);
+      var eDate = new Date(cn.endDate);
       var today = new Date();
       if (cn.manager !== Meteor.settings.ldap_admin && sDate <= today && eDate >= today) {
-        if (filterStr === '') {
+        if (!filterStr) {
           filterStr = '(cn=' + cn.manager + ')';
         } else {
           filterStr = '(|' + filterStr + '(cn=' + cn.manager + '))';
@@ -78,17 +83,21 @@ LDAP.getGroupList = function (isAdminList) {
       scope: 'sub',
       attributes: ['member']  // add more ldap search attributes here when needed
     };
-    if (filterStr === '') {
+    if (!filterStr) {
+      logger.debug('server/accounts.js: getGroupList: filterStr empty');
       return {
-        member: false
+        member: null
       };
     }
   }
 
-  return wrappedLdapSearch('cn=groups,cn=accounts,' + Meteor.settings.ldap_search_base, opts);
+  var res = wrappedLdapSearch('cn=groups,cn=accounts,' + Meteor.settings.ldap_search_base, opts);
+  logger.debug('server/accounts.js: getGroupList: res = ' + JSON.stringify(res, null, 4));
+  return res;
 };
 
 LDAP.getAllGroups = function () {
+  logger.debug('server/accounts.js: getAllGroups');
   var opts = {
     filter: '(objectClass=ipausergroup)',
     scope: 'sub',
@@ -100,7 +109,7 @@ LDAP.getAllGroups = function () {
 
 LDAP.checkAccount = function (username, password) {
   var binddn = 'uid=' + username + ',cn=users,cn=accounts,' + Meteor.settings.ldap_search_base;
-  if (wrappedLdapBind(binddn, password).status === 0) {
+  if (wrappedLdapBind(binddn, password).status == 0) {
     return true;
   }
 
@@ -109,7 +118,8 @@ LDAP.checkAccount = function (username, password) {
 
 LDAP.bind = function () {
   var binddn = 'uid=' + Meteor.settings.ldap_admin_account + ',cn=users,cn=accounts,' + Meteor.settings.ldap_search_base;
-  if (wrappedLdapBind(binddn, Meteor.settings.ldap_admin_password).status === 0) {
+  logger.debug('server/accounts.js: binddn = ' + binddn);
+  if (wrappedLdapBind(binddn, Meteor.settings.ldap_admin_password).status == 0) {
     return true;
   }
 
@@ -126,15 +136,9 @@ Meteor.startup(function () {
     authenticateLdapEmployee: function (username, password) {
       try {
         if (LDAP.checkAccount(username, password)) {
-          var adminString = LDAP.getGroupList(true).member;
-          var managerString = LDAP.getGroupList(false).member;
-          if (adminString === null) {
-            adminString = '';
-          }
-          if (managerString === null) {
-            managerString = '';
-          }
-          return [LDAP.search(username), adminString, managerString];
+          return [LDAP.search(username),
+                  LDAP.getGroupList(true).member,
+                  LDAP.getGroupList(false).member];
         } else {
           return null;
         }
@@ -147,7 +151,9 @@ Meteor.startup(function () {
     getLdapEmployee: function (username) {
       try {
         if (LDAP.bind()) {
-          return [LDAP.search(username), LDAP.getGroupList(true).member, LDAP.getGroupList(false).member];
+          return [LDAP.search(username),
+                  LDAP.getGroupList(true).member,
+                  LDAP.getGroupList(false).member];
         } else {
           return null;
         }
