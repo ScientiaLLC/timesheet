@@ -82,7 +82,61 @@ Meteor.methods({
 
     return [user._id];
   },
-  updateProjectCommentsTimeSheet: function (date, user, project, issues, next, data) {
+  updateIssuesTimeSheet: function (date, user, project, issues, data) {
+    /*
+     Update project comments seciton of an active timesheet for a specified project.
+     This should be called from an onBlur event.
+     */
+    var sheet = TimeSheet.findOne({'startDate': date, 'userId': user});
+    var prEntriesArr = sheet['projectEntriesArray'];
+    var entryArrToAdd = null;
+    var oldproject;
+
+    //check to make sure editable
+    var sentBack;
+    var approved;
+    var active = sheet['active'];
+    var submitted = sheet['submitted'];
+    //active = 1 and (SentBack = true or submitted = false)
+    if (active != 1) {
+      return;
+    }
+    var pSentBacks = {};
+    for (var i in sheet.projectApprovalArray) {
+      pSentBacks[sheet.projectApprovalArray[i].projectId] = sheet.projectApprovalArray[i].sentBack;
+    }
+    var index = 0;
+
+    for (i = 0; i < prEntriesArr.length; i++) {
+      if (prEntriesArr[i]['projectId'] == project) {
+        index = i;
+        entryArrToAdd = prEntriesArr[i];
+        oldproject = prEntriesArr[i]['projectId'];
+        sentBack = pSentBacks[project];
+      }
+    }
+
+    if (data) {
+      //alert("doesnt work C");
+      if (oldproject != data.project) {
+        return;
+      }
+    } else if (submitted && !sentBack) {
+      return;
+    }
+
+    entryArrToAdd['issues'] = issues;
+    prEntriesArr.splice(index, 1)
+    prEntriesArr.splice(index, 0, entryArrToAdd);
+
+    TimeSheet.update({'_id': sheet._id}, {
+      $set: {
+        'projectEntriesArray': prEntriesArr
+      },
+    });
+
+  },
+  updateNextGoalsTimeSheet: function (date, user, project, next, data) {
     /*
      Update project comments seciton of an active timesheet for a specified project.
      This should be called from an onBlur event.
@@ -126,7 +180,6 @@ Meteor.methods({
     }
 
     entryArrToAdd['next'] = next;
-    entryArrToAdd['issues'] = issues;
     prEntriesArr.splice(index, 1)
     prEntriesArr.splice(index, 0, entryArrToAdd);
 
