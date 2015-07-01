@@ -123,13 +123,13 @@
   <div class="row commentRow no-gutter">
     <div class="col-md-6 col-xs-12">
       <h4>General Comment</h4>
-      <input id="generalComment" type="text"
-             class="large-input form-control" value={{genComment}}>
+      <div contenteditable id="generalComment" class="commentBox">{{genComment}}</div>
+       
     </div>
     <div class="col-md-6 col-xs-12">
       <h4>Concerns</h4>
-      <input id="concerns" type="text" class="large-input form-control"
-             value={{concerns}}>
+      <div contenteditable id="concerns" class="commentBox">{{concerns}}</div>
+      
     </div>
 
     {{#if isEditing}}
@@ -258,9 +258,11 @@
       <h5>Comment</h5></div>
     <div
         class="col-md-2 col-sm-offset-0 col-xs-offset-1 col-xs-11 col-sm-11 pull-xs-right">
-      <input id="Comment" type="text"
+    <!--   <input id="Comment" type="text"
              class="large-input form-control enterable {{sentBack}}"
-             value=""></div>
+             value=""></div> -->
+            <div contenteditable class="commentBox {{sentBack}}" id="Comment"></div>
+        </div>
     <div class="col-md-1 col-sm-1 col-xs-12">
       <button type="button"
               class="btn btn-primary enterable {{sentBack}} pull-right">
@@ -297,24 +299,31 @@
 <template name="projectComments">
   <div class="row top-buffer projectCommentsRow no-gutter">
     <div class="col-md-12 hidden-lg hidden-md"><h4>Project</h4></div>
-    <div class="col-md-2 col-sm-12" id={{project}}><input
+    <div class="col-md-2 col-sm-12" id={{project}}>
+      <input
         id="project_comments_name" type="text"
         class="large-input form-control" readonly
         value={{name project}}></div>
     <div class="col-xs-11 col-sm-offset-1 col-xs-offset-1 hidden-lg hidden-md">
       This Week's Issues
     </div>
-    <div class="col-md-3 col-xs-11 col-md-offset-0 col-xs-offset-1"><input
+    <div class="col-md-3 col-xs-11 col-md-offset-0 col-xs-offset-1">
+   <!--  <input
         id="Issues" type="text"
         class="large-input form-control enterable {{sentBack}}"
-        value={{issues project}}></div>
+        value={{issues project}}></div> -->
+        <div contenteditable id="Issues" class="commentBox {{sentBack}}">{{issues project}}</div>
+      </div>
     <div class="col-xs-11 col-sm-offset-1 col-xs-offset-1 hidden-lg hidden-md">
       Goals for Next Week
     </div>
-    <div class="col-md-3 col-xs-11 col-md-offset-0 col-xs-offset-1"><input
+    <div class="col-md-3 col-xs-11 col-md-offset-0 col-xs-offset-1">
+   <!--  <input
         id="Next" type="text"
         class="large-input form-control enterable {{sentBack}}"
-        value={{next project}}></div>
+        value={{next project}}></div> -->
+         <div contenteditable id="Next" class="commentBox {{sentBack}}">{{next project}}</div>
+    </div>
     <div class="col-xs-11 col-sm-offset-1 col-xs-offset-1 hidden-lg hidden-md">
       Hours
     </div>
@@ -399,10 +408,11 @@
       <h5>Comment</h5></div>
     <div
         class="filledRow col-md-2 col-sm-offset-0 col-xs-offset-1 col-xs-11 col-sm-11 pull-xs-right">
-      <input id="Comment"
+        <div contenteditable class="commentBox {{sentBack}}" id="Comment" >{{comment}}</div>
+     <!--  <input id="Comment"
              type="text"
              class="large-input form-control enterable {{sentBack}}"
-             value={{comment}}>
+             value={{comment}}> -->
     </div>
     <div class="col-md-1 col-xs-12 col-sm-1">
       <button type="button"

@@ -86,6 +86,12 @@ ul[class="navbar nav-pills navbar-default"] {
 /*height: 25px;*/
 /*}*/
 
+.commentBox {
+    background-color: #FFFFFF;
+    border: 1px solid black; 
+    /*height: 20px;*/
+}
+
 #login_info_spacer {
     flex: 1;
 }
@@ -638,3 +644,5 @@ ul {
         transform: translate(-50%, 150%);
     }
 }
+
+

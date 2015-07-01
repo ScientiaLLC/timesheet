@@ -141,7 +141,7 @@ ActiveDBService = {
      Updates a row in an active timesheet.  This should be called from an onBlur event.
      Note that this is implemented by calling removeRowInTimesheet() followed by addRowToTimesheet().
      */
-
+     console.log("UpdateRow " + comment);
     var sheet = TimeSheet.findOne({'startDate': date, 'userId': user});
     var prEntriesArr = sheet.projectEntriesArray;
     var entryArrToAdd = null;
@@ -214,7 +214,7 @@ ActiveDBService = {
     }
   },
 
-  updateCommentsInTimeSheet: function (date, user, gen_comment, concerns, callback) {
+  updateGeneralCommentsInTimeSheet: function (date, user, gen_comment, callback) {
     /*
      Update comments and concerns seciton of an active timesheet.
      This should be called from an onBlur event.
@@ -227,7 +227,33 @@ ActiveDBService = {
     if (disable) {
       return;
     }
-    Meteor.call('updateGenComments', date, user, gen_comment, concerns, callback);
+    TimeSheet.update({'_id': sheet._id},
+        {
+          $set: {
+            'generalComment': gen_comment,
+          }
+        });
+    // Meteor.call('updateGenComments', date, user, gen_comment, concerns, callback);
+  },
+  updateConcernsInTimeSheet: function (date, user, concerns, callback) {
+    /*
+     Update comments and concerns seciton of an active timesheet.
+     This should be called from an onBlur event.
+     */
+    var sheet = TimeSheet.findOne({'startDate': date, 'userId': user});
+
+    //make sure not updating when it shouldn't
+    var data = Session.get('editing-user-page');
+    var disable = data || (sheet.submitted && !TimeSheetService.checkSentBack());
+    if (disable) {
+      return;
+    }
+   TimeSheet.update({'_id': sheet._id},
+        {
+          $set: {
+            'concerns': concerns
+          }
+        });
   }
 };
 var containsInArray = function(item, array){
