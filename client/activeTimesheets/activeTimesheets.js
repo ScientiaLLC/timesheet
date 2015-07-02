@@ -808,6 +808,7 @@ Template.lastSection.events = {
 
     
     var gen_comment = rowForComment.innerText;
+    rowForComment.innerText = "";
       
     if(gen_comment == null){
       gen_comment = '';
@@ -837,6 +838,7 @@ Template.lastSection.events = {
     var row = event.currentTarget;
     var rowForComment = event.target;
     var concerns = rowForComment.innerText;
+    rowForComment.innerText = "";
     
     if(concerns == null){
       concerns = '';
@@ -1039,9 +1041,12 @@ Template.projectComments.events = {
      Handles onBlur effects and saving data to the timesheet.
      */
     var row = event.target;
-    var issues = row.innerText;
+    var issues = event.currentTarget.innerText;
+    if(event.target.innerText != ""){
+      event.target.innerText = "";
+    }
     // var next = $(row).find('#Next')[0].innerTexts;
-    var projectId = currentTarget.parentNode.parentNode.firstChild.parentNode.childNodes[3].id;
+    var projectId = event.currentTarget.parentNode.parentNode.firstChild.parentNode.childNodes[3].id;
     var user = Session.get('LdapId');
     var data = Session.get('editing-user-page');
     if (data) {
@@ -1065,8 +1070,12 @@ Template.projectComments.events = {
      */
     var row = event.currentTarget;
     // var issues = $(row).find('#Issues')[0].innerText;
+    // next = next.replace(/\s+/g, '');
     var next = event.target.innerText;
-    var projectId = currentTarget.parentNode.parentNode.firstChild.parentNode.childNodes[3].id;
+    if(event.target.innerText != ""){
+      event.target.innerText = "";
+    }
+    var projectId = event.currentTarget.parentNode.parentNode.firstChild.parentNode.childNodes[3].id;
     var user = Session.get('LdapId');
     var data = Session.get('editing-user-page');
     if (data) {
@@ -1101,6 +1110,8 @@ Template.projectHoursFilled.events = {
     var row = event.currentTarget.parentNode;
     // var comment_t = $(row).find('#Comment')[0].value;
     var comment = $(row).find('#Comment')[0].innerText;
+    $(row).find('#Comment')[0].innerText = "";
+    // comment = comment.replace(/\s+/g, '');
     var sunday_t = parseFloat($(row).find('#Sunday')[0].value) || 0;
     var monday_t = parseFloat($(row).find('#Monday')[0].value) || 0;
     var tuesday_t = parseFloat($(row).find('#Tuesday')[0].value) || 0;
@@ -1240,7 +1251,6 @@ Template.projectHours.events = {
       /*
        Database Entry
        Adding entry to the Database correctly. -Dan
-
        */
       var date = Session.get("startDate");
       var user = Session.get('LdapId');

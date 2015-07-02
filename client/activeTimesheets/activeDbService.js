@@ -178,10 +178,13 @@ ActiveDBService = {
           index1 = i;
           entryArrToAdd = prEntriesArr[i];
           sentBack = pSentBacks[oldproject];
+          // prEntriesArr[i].comment = "";
+          // console.log(prEntriesArr);
         }
       }
     }
-
+    
+     
     //return if the row should not be editable
     var data = Session.get('editing-user-page');
 

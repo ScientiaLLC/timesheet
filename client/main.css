@@ -88,8 +88,9 @@ ul[class="navbar nav-pills navbar-default"] {
 
 .commentBox {
     background-color: #FFFFFF;
-    border: 1px solid black; 
-    /*height: 20px;*/
+    border: 1px solid #D0D0D0; 
+    min-height: 30px;
+    border-radius: 5px;
 }
 
 #login_info_spacer {
