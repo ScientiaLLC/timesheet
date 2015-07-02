@@ -141,7 +141,6 @@ ActiveDBService = {
      Updates a row in an active timesheet.  This should be called from an onBlur event.
      Note that this is implemented by calling removeRowInTimesheet() followed by addRowToTimesheet().
      */
-     console.log("UpdateRow " + comment);
     var sheet = TimeSheet.findOne({'startDate': date, 'userId': user});
     var prEntriesArr = sheet.projectEntriesArray;
     var entryArrToAdd = null;
@@ -181,7 +180,8 @@ ActiveDBService = {
         }
       }
     }
-
+    
+     
     //return if the row should not be editable
     var data = Session.get('editing-user-page');
 
@@ -200,11 +200,9 @@ ActiveDBService = {
         'Comment': comment,
         'rowID': rowID
       });
-
       entryArrToAdd.EntryArray = entryArray2;
       prEntriesArr.splice(index1, 1);
       prEntriesArr.splice(index1, 0, entryArrToAdd);
-
       Meteor.call('updateTimesheetProjectEntriesArray', sheet._id, prEntriesArr);
 
     } else {
