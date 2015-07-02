@@ -177,6 +177,8 @@ ActiveDBService = {
           index1 = i;
           entryArrToAdd = prEntriesArr[i];
           sentBack = pSentBacks[oldproject];
+          // prEntriesArr[i].comment = "";
+          // console.log(prEntriesArr);
         }
       }
     }

@@ -1108,6 +1108,8 @@ Template.projectHoursFilled.events = {
      */
     var row = event.currentTarget.parentNode;
     var comment = $(row).find('#Comment')[0].innerText;
+    $(row).find('#Comment')[0].innerText = "";
+    // comment = comment.replace(/\s+/g, '');
     var sunday_t = parseFloat($(row).find('#Sunday')[0].value) || 0;
     var monday_t = parseFloat($(row).find('#Monday')[0].value) || 0;
     var tuesday_t = parseFloat($(row).find('#Tuesday')[0].value) || 0;
