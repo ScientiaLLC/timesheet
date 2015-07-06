@@ -482,7 +482,6 @@ Meteor.methods({
     //This method is for when we want to get all the rows for a user on a given Timecard. -Dan
     return TimeSheet.find({'startDate': date, 'userId': user});
   },
-
   sendEmail: function (to, subject, body) {
     /*
      Send the Email
@@ -618,7 +617,7 @@ Meteor.methods({
                   comments[projectArray[key]] = projectComments[key];
                 }
                 //console.log(report);
-                Meteor.call('sendEmail', 'iversoda@rose-hulman.edu', 'Projects', EmailTemplates.getReportEmail(report, comments, start, end));
+                Meteor.call('sendEmail', 'jtlashomb9@gmail.com', 'Projects', EmailTemplates.getReportEmail(report, comments, start, end));
               }
 
             });
