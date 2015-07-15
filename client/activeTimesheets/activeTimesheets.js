@@ -1,4 +1,4 @@
-Template.activeTimesheets.helpers({
+(function(){Template.activeTimesheets.helpers({
   getSunday: function () {
     /*
      Returns the Sunday of the current week
@@ -329,10 +329,23 @@ Template.SelectedTimesheet.helpers({
           sentBack = "notSentBack";
         }
       }
-
+      // console.log("rows");
+   
       var EntryArray = projectEntries[i]['EntryArray'];
       for (j = 0; j < EntryArray.length; j++) {
-        var comment = EntryArray[j]['Comment'];
+        var comment = '';
+        if(EntryArray[j]['Comment'] != null){
+        var commentArr = EntryArray[j]['Comment'].split("↵");
+        // console.log(commentArr);
+        commentArr.forEach(function (commentLine){
+          // console.log(commentLine);
+          comment += commentLine;
+        });
+        }
+        EntryArray[j]['Comment'] = '';
+
+        // console.log(comment_t);
+        // console.log(comment);
         var rowID = EntryArray[j]['rowID'];
         if (rowID > maxRow) {
           maxRow = rowID;
@@ -353,7 +366,7 @@ Template.SelectedTimesheet.helpers({
         });
       }
     }
-
+    // console.log(rows);
     function compare(a, b) {
       if (a.rowID < b.rowID)
         return -1;
@@ -718,7 +731,6 @@ Template.lastSection.helpers({
     var sheet = TimeSheet.findOne({'startDate': date, 'userId': user});
 
     if (!sheet) return;
-
     return sheet['concerns'];
 
   },
@@ -759,7 +771,8 @@ function hackRefresh() {
 }
 function checkNonEmptyAddRow() {
   var row = $('.add_row');
-  var comment_t = $(row).find('#Comment')[0].value;
+  var comment = '';
+  var comment = $(row).find('#Comment')[0].innerText;
   var sunday_t = parseFloat($(row).find('#Sunday')[0].value, 10);
   var monday_t = parseFloat($(row).find('#Monday')[0].value, 10);
   var tuesday_t = parseFloat($(row).find('#Tuesday')[0].value, 10);
@@ -786,13 +799,20 @@ function checkNonEmptyAddRow() {
 }
 
 Template.lastSection.events = {
-  'blur .commentRow': function (event) {
+  'blur #generalComment': function (event) {
     /*
      Handles onBlur effects and saving data to the timesheet.
      */
     var row = event.currentTarget;
-    var gen_comment = $(row).find('#generalComment')[0].value;
-    var concerns = $(row).find('#concerns')[0].value;
+    var rowForComment = event.target;
+
+    
+    var gen_comment = rowForComment.innerText;
+    rowForComment.innerText = "";
+      
+    if(gen_comment == null){
+      gen_comment = '';
+    }
     var user = Session.get('LdapId');
     var data = Session.get('editing-user-page');
     if (data) {
@@ -801,10 +821,39 @@ Template.lastSection.events = {
         user = userO._id;
       }
     }
+    TimeSheetService.removeErrorClasses(row, ['#generalComment']);
 
-    TimeSheetService.removeErrorClasses(row, ['#concerns', '#generalComment']);
+    ActiveDBService.updateGeneralCommentsInTimeSheet(Session.get("startDate"), user, gen_comment, function () {
+      $('.toast').addClass('active');
+      setTimeout(function () {
+        $('.toast').removeClass('active');
+      }, 5000);
+    });
+  },
+  'blur #concerns': function (event) {
+    /*
+     Handles onBlur effects and saving data to the timesheet.
+     */
 
-    ActiveDBService.updateCommentsInTimeSheet(Session.get("startDate"), user, gen_comment, concerns, function () {
+    var row = event.currentTarget;
+    var rowForComment = event.target;
+    var concerns = rowForComment.innerText;
+    rowForComment.innerText = "";
+    
+    if(concerns == null){
+      concerns = '';
+    }
+    var user = Session.get('LdapId');
+    var data = Session.get('editing-user-page');
+    if (data) {
+      var userO = Meteor.users.findOne({username: data.username});
+      if (userO) {
+        user = userO._id;
+      }
+    }
+    TimeSheetService.removeErrorClasses(row, ['#concerns']);
+
+    ActiveDBService.updateConcernsInTimeSheet(Session.get("startDate"), user, concerns, function () {
       $('.toast').addClass('active');
       setTimeout(function () {
         $('.toast').removeClass('active');
@@ -987,14 +1036,17 @@ Template.lastSection.events = {
 };
 
 Template.projectComments.events = {
-  'blur .projectCommentsRow': function (event) {
+  'blur #Issues': function (event) {
     /*
      Handles onBlur effects and saving data to the timesheet.
      */
-    var row = event.currentTarget;
-    var issues = $(row).find('#Issues')[0].value;
-    var next = $(row).find('#Next')[0].value;
-    var projectId = $(row).find('#project_comments_name')[0].parentNode.id;
+    var row = event.target;
+    var issues = event.currentTarget.innerText;
+    if(event.target.innerText != ""){
+      event.target.innerText = "";
+    }
+    // var next = $(row).find('#Next')[0].innerTexts;
+    var projectId = event.currentTarget.parentNode.parentNode.firstChild.parentNode.childNodes[3].id;
     var user = Session.get('LdapId');
     var data = Session.get('editing-user-page');
     if (data) {
@@ -1004,7 +1056,36 @@ Template.projectComments.events = {
       }
     }
 
-    Meteor.call('updateProjectCommentsTimeSheet', Session.get("startDate"), user, projectId, issues, next, Session.get('editing-user-page'),
+    Meteor.call('updateIssuesTimeSheet', Session.get("startDate"), user, projectId, issues, Session.get('editing-user-page'),
+        function () {
+          $('.toast').addClass('active');
+          setTimeout(function () {
+            $('.toast').removeClass('active');
+          }, 5000);
+        });
+  },
+  'blur #Next': function (event) {
+    /*
+     Handles onBlur effects and saving data to the timesheet.
+     */
+    var row = event.currentTarget;
+    // var issues = $(row).find('#Issues')[0].innerText;
+    // next = next.replace(/\s+/g, '');
+    var next = event.target.innerText;
+    if(event.target.innerText != ""){
+      event.target.innerText = "";
+    }
+    var projectId = event.currentTarget.parentNode.parentNode.firstChild.parentNode.childNodes[3].id;
+    var user = Session.get('LdapId');
+    var data = Session.get('editing-user-page');
+    if (data) {
+      var userO = Meteor.users.findOne({username: data.username});
+      if (userO) {
+        user = userO._id;
+      }
+    }
+
+    Meteor.call('updateNextGoalsTimeSheet', Session.get("startDate"), user, projectId, next, Session.get('editing-user-page'),
         function () {
           $('.toast').addClass('active');
           setTimeout(function () {
@@ -1025,9 +1106,8 @@ Template.projectHoursFilled.events = {
     /*
      Handles onBlur effects and saving data to the timesheet.
      */
-
     var row = event.currentTarget.parentNode;
-    var comment_t = $(row).find('#Comment')[0].value;
+    var comment = $(row).find('#Comment')[0].innerText;
     var sunday_t = parseFloat($(row).find('#Sunday')[0].value) || 0;
     var monday_t = parseFloat($(row).find('#Monday')[0].value) || 0;
     var tuesday_t = parseFloat($(row).find('#Tuesday')[0].value) || 0;
@@ -1047,13 +1127,12 @@ Template.projectHoursFilled.events = {
         user = userO._id;
       }
     }
-
     TimeSheetService.removeErrorClasses(row, ['#Comment', '#Sunday', '#Monday', '#Tuesday', '#Wednesday', '#Thursday', '#Friday', '#Saturday', '#projectName']);
 
-    if (TimeSheetService.ensureValidEntry(row, comment_t, sunday_t, monday_t, tuesday_t, wednesday_t, thursday_t, friday_t, saturday_t, projectId)) {
+    if (TimeSheetService.ensureValidEntry(row, comment, sunday_t, monday_t, tuesday_t, wednesday_t, thursday_t, friday_t, saturday_t, projectId)) {
 
       ActiveDBService.updateRowInTimeSheet(Session.get("startDate"), user, projectId,
-          comment_t,
+          comment,
           sunday_t,
           monday_t,
           tuesday_t,
@@ -1081,7 +1160,7 @@ Template.projectHoursFilled.events = {
     var row = event.currentTarget.parentNode.parentNode;
     var projectId = $(row).find('#project_select')[0].parentNode.id;
 
-    var comment_t = $(row).find('#Comment')[0].value;
+    var comment_t = $(row).find('#Comment')[0].innerText;
     var sunday_t = $(row).find('#Sunday')[0].value;
     var monday_t = $(row).find('#Monday')[0].value;
     var tuesday_t = $(row).find('#Tuesday')[0].value;
@@ -1139,7 +1218,8 @@ Template.projectHours.events = {
      Check for errors first, then add the row to the timesheet if there are none.
      */
     var row = event.currentTarget.parentNode.parentNode;
-    var comment_t = $(row).find('#Comment')[0].value;
+    // console.log(row);
+    var comment= $(row).find('#Comment')[0].innerText;
     var sunday_t = parseFloat($(row).find('#Sunday')[0].value, 10) || 0;
     var monday_t = parseFloat($(row).find('#Monday')[0].value, 10) || 0;
     var tuesday_t = parseFloat($(row).find('#Tuesday')[0].value, 10) || 0;
@@ -1151,7 +1231,7 @@ Template.projectHours.events = {
     // I added this so we can retrieve the selected project's ID so we can add it to the Database
     var projectIndex = $(row).find('#project_select')[0].selectedIndex;
     var projectId = $(row).find('#project_select')[0].children[projectIndex].id;
-    console.log(projectId);
+    // console.log(projectId);
 
     Session.get("max_Row");
     var rowID = Session.get("max_Row") + 1;
@@ -1161,12 +1241,11 @@ Template.projectHours.events = {
 
     TimeSheetService.removeErrorClasses(row, ['#Comment', '#Sunday', '#Monday', '#Tuesday', '#Wednesday', '#Thursday', '#Friday', '#Saturday']);
 
-    if (TimeSheetService.ensureValidEntry(row, comment_t, sunday_t, monday_t, tuesday_t, wednesday_t, thursday_t, friday_t, saturday_t)) {
+    if (TimeSheetService.ensureValidEntry(row, comment, sunday_t, monday_t, tuesday_t, wednesday_t, thursday_t, friday_t, saturday_t)) {
 
       /*
        Database Entry
        Adding entry to the Database correctly. -Dan
-
        */
       var date = Session.get("startDate");
       var user = Session.get('LdapId');
@@ -1180,11 +1259,11 @@ Template.projectHours.events = {
       var sheet = TimeSheet.findOne({'startDate': date, 'userId': user});
 
       var data = Session.get('editing-user-page');
-      console.log("here");
+      // console.log("here");
       if (!sheet['submitted'] || TimeSheetService.checkSentBack() || data) {
-        console.log("in if");
+        // console.log("in if");
         Meteor.call('addRowToTimeSheet', Session.get("startDate"), user, projectId,
-            comment_t,
+            comment,
             sunday_t,
             monday_t,
             tuesday_t,
@@ -1198,7 +1277,7 @@ Template.projectHours.events = {
                 $('.toast').removeClass('active');
               }, 5000);
             });
-        comment_t = '';
+        comment = '';
         sunday_t = '';
         monday_t = '';
         tuesday_t = '';
@@ -1210,7 +1289,7 @@ Template.projectHours.events = {
       }
     }
 
-    $(row).find('#Comment')[0].value = comment_t;
+    $(row).find('#Comment')[0].innerText = comment;
     $(row).find('#Sunday')[0].value = sunday_t == 0 ? '' : sunday_t;
     $(row).find('#Monday')[0].value = monday_t == 0 ? '' : monday_t;
     $(row).find('#Tuesday')[0].value = tuesday_t == 0 ? '' : tuesday_t;
@@ -1279,9 +1358,11 @@ TimeSheetService = {
     /*
      Error handling for timesheet fields
      */
+     console.log(saturday_t);
+     console.log(ActiveDBService.getDayTotal(6));
     var out_of_bounds_message = "Field must be a multiple of .25 and cannot exceed 24 hours in a day across all projects";
 
-    console.log(sunday_t);
+    // console.log(sunday_t);
     var valid = true;
     if (comment_t === '') {
       TimeSheetService.addError(row, '#Comment', "Description is Required");
@@ -1367,3 +1448,33 @@ TimeSheetService = {
     return valid;
   }
 };
+
+function makeExpandingArea(container) {
+//   if ( window.opera && /Mac OS X/.test( navigator.appVersion ) ) {
+//   container.querySelector( 'pre' )
+//            .appendChild(
+//     document.createElement( 'br' )
+//   );
+// }
+ var area = container.querySelector('textarea');
+ var span = container.querySelector('span');
+ if (area.addEventListener) {
+   area.addEventListener('input', function() {
+     span.textContent = area.value;
+   }, false);
+   span.textContent = area.value;
+ } else if (area.attachEvent) {
+   // IE8 compatibility
+   area.attachEvent('onpropertychange', function() {
+     span.innerText = area.value;
+   });
+   span.innerText = area.value;
+ }
+// Enable extra CSS
+container.className += "active";
+}var areas = document.querySelectorAll('.expandingArea');
+var l = areas.length;while (l--) {
+ makeExpandingArea(areas[l]);
+};
+
+})();

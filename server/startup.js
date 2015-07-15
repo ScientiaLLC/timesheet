@@ -103,7 +103,11 @@ function scheduleReminders() {
 
 Meteor.startup(function () {
   // setup email
+  //the email is set up to an gmail account I made to send emails.   
+  //The email is scientiatestemail@gmail.com and the password is emailtester.
+  //I had to create a gmail becuase it required a authenication of an account to send the email.  
   process.env.MAIL_URL = Meteor.settings.mail_url;
+  
   // setup cron configuration
   SyncedCron.options.log = true;
   SyncedCron.options.utc = false;
