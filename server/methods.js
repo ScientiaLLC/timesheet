@@ -376,7 +376,7 @@ Meteor.methods({
       prEntriesArr.push(entryArrToAdd);
 
     } else {
-      console.log(commment);
+      console.log(comment);
       entryArray = [{
         'hours': [Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday],
         'Comment': comment,

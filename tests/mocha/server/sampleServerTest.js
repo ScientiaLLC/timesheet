@@ -226,42 +226,6 @@ if (!(typeof MochaWeb === 'undefined')) {
             'comment', 0, 1, 2, 3, 4, 5, 6, 1);
       });
 
-      it("editing a projectComments row is successful", function () {
-        var startDate = '03/29/2015';
-        var endDate = '04/05/2015';
-        var userId = 'ABCDE';
-        var project = ChargeNumbers.findOne({'id': '45'})._id;
-        Meteor.call('updateProjectCommentsTimeSheet', startDate, userId, project,
-            'issues', 'next', null);
-
-        chai.assert.ok(TimeSheet.findOne({
-              'startDate': startDate,
-              'userId': userId
-            }).projectEntriesArray[0].next == 'next');
-        chai.assert.ok(TimeSheet.findOne({
-              'startDate': startDate,
-              'userId': userId
-            }).projectEntriesArray[0].issues == 'issues');
-      });
-
-      it("editing a projectComments row is unsuccessful if the data project is different", function () {
-        var startDate = '03/29/2015';
-        var endDate = '04/05/2015';
-        var userId = 'ABCDE';
-        var project = ChargeNumbers.findOne({'id': '45'})._id;
-        Meteor.call('updateProjectCommentsTimeSheet', startDate, userId, project,
-            '223', '334', {'project': '1234'});
-
-        chai.assert.ok(TimeSheet.findOne({
-              'startDate': startDate,
-              'userId': userId
-            }).projectEntriesArray[0].next == 'next');
-        chai.assert.ok(TimeSheet.findOne({
-              'startDate': startDate,
-              'userId': userId
-            }).projectEntriesArray[0].issues == 'issues');
-      });
-
       it("removing a row from a timesheet is successful", function () {
         var startDate = '03/29/2015';
         var endDate = '04/05/2015';
