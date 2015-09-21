@@ -4,6 +4,11 @@ if (!(typeof MochaWeb === 'undefined')) {
       it("should have a Meteor version defined", function () {
         chai.assert(Meteor.release);
       });
+
+      it("should have one and only one holiday project in ChargeNumbers collection", function() {
+        var holiday_count = ChargeNumbers.find({'is_holiday': true}).count();
+        chai.assert(holiday_count === 1);
+      });
     });
 
     describe("Testing accessing server methods", function () {

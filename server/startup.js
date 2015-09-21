@@ -48,20 +48,22 @@ function setupMissingTimesheets() {
       function (user) {
         //Small Change (changed uppercase D to d in userId) here to see if this works
         var projectApprovalArray = [];
-        user.projects.forEach(function (pId) {
-          var project = ChargeNumbers.findOne({_id: pId});
-          if (!project) {
-            Meteor.call('removeEmployeeFromProject', user._id, pId);
-            return;
-          }
-          projectId = project._id;
-          projectApprovalArray.push({
-            projectId: projectId,
-            approved: false,
-            sentBack: false,
-            comment: ''
+        if (user.projects.constructor === Array) {
+          user.projects.forEach(function (pId) {
+            var project = ChargeNumbers.findOne({_id: pId});
+            if (!project) {
+              Meteor.call('removeEmployeeFromProject', user._id, pId);
+              return;
+            }
+            projectId = project._id;
+            projectApprovalArray.push({
+              projectId: projectId,
+              approved: false,
+              sentBack: false,
+              comment: ''
+            });
           });
-        });
+        }
         var previousTimesheet = TimeSheet.findOne({
           'startDate': dStrL,
           'userId': user._id
@@ -95,6 +97,22 @@ function setupMissingTimesheets() {
   );
 }
 
+/*
+ Create weekly timesheet adder job
+ */
+function scheduleMissingTimesheets(timeString) {
+  SyncedCron.add({
+    name: 'setup weekly timesheets',
+    schedule: function (parser) {
+      // parser is a later.parse object
+      return parser.text(timeString);
+    },
+    job: function () {
+      setupMissingTimesheets();
+    }
+  });
+}
+
 function scheduleReminders() {
   Jobs.find({}).forEach(function (job) {
     Meteor.call('scheduleJob', job);
@@ -103,34 +121,17 @@ function scheduleReminders() {
 
 Meteor.startup(function () {
   // setup email
-  //the email is set up to an gmail account I made to send emails.   
-  //The email is scientiatestemail@gmail.com and the password is emailtester.
-  //I had to create a gmail becuase it required a authenication of an account to send the email.  
   process.env.MAIL_URL = Meteor.settings.mail_url;
-  
+
   // setup cron configuration
   SyncedCron.options.log = true;
   SyncedCron.options.utc = false;
 
   setupHolidayProject();
 
-  logger.debug('start missing setup');
   setupMissingTimesheets();
-  logger.debug('finish missing setup');
 
-  /*
-   Create weekly timesheet adder job
-   */
-  SyncedCron.add({
-    name: 'setup weekly timesheets',
-    schedule: function (parser) {
-      // parser is a later.parse object
-      return parser.text('at 00:00 on Saturday');
-    },
-    job: function () {
-      setupMissingTimesheets();
-    }
-  });
+  scheduleMissingTimesheets('at 15:36 on Monday');
 
   scheduleReminders();
 
