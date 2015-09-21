@@ -3,6 +3,15 @@
 MeteorWrapperLdapjs.Attribute.settings.guid_format =
     MeteorWrapperLdapjs.GUID_FORMAT_B;
 
+// make sure we have read in a Meteor settings file:
+if (!Meteor.settings.ldap_url ||
+    !Meteor.settings.ldap_search_base ||
+    !Meteor.settings.ldap_admin ||
+    !Meteor.settings.ldap_admin_account ||
+    !Meteor.settings.ldap_admin_password) {
+  logger.error('Meteor settings file must be used to work with accounts.js');
+}
+
 LDAP = {};
 LDAP.ldap = MeteorWrapperLdapjs;
 LDAP.client = LDAP.ldap.createClient({
