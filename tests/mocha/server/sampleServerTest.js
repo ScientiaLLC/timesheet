@@ -32,6 +32,13 @@ if (!(typeof MochaWeb === 'undefined')) {
       });
     });
 
+    // need a better way to test emails than hardcoding to field
+    /*describe("Email notifications", function() {
+      it("should send reminderEmails to accounts", function() {
+        Meteor.call('sendEmail', 'account@example.com', 'Test Subject', 'Test Body');
+      });
+    });*/
+
     describe("Projects Tab", function () {
       it("Dropping all Projects", function () {
         ChargeNumbers.remove({});

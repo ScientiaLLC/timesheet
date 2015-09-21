@@ -488,7 +488,7 @@ Meteor.methods({
      */
     Email.send({
       bcc: to,
-      from: 'noreply.scientiallc.timesheet@gmail.com',
+      from: Meteor.settings.mail_from,
       html: body,
       subject: subject
     });
@@ -616,10 +616,7 @@ Meteor.methods({
                   report[projectArray[key]] = projectHours[key];
                   comments[projectArray[key]] = projectComments[key];
                 }
-                //console.log(report);
-                Meteor.call('sendEmail', 'jtlashomb9@gmail.com', 'Projects', EmailTemplates.getReportEmail(report, comments, start, end));
               }
-
             });
             break;
         }

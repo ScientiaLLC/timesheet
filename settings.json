@@ -4,5 +4,6 @@
 "ldap_url" : "ldap://ldap.example.com:389/",
 "ldap_search_base" : "dc=example,dc=com",
 "ldap_admin" : "time_admins",
-"mail_url" : "smtp://USERNAME:PASSWORD@HOST:PORT/"
+"mail_url" : "smtp://USERNAME:PASSWORD@HOST:PORT/",
+"mail_from" : "username@example.com"
 }
