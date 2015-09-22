@@ -6,7 +6,7 @@ Meteor.startup(function() {
      Session.set('manager_groups', data);
    }
  });
-}); 
+});
 
 Template.activeProjectEntries.helpers({
     projects: function(){
@@ -25,8 +25,8 @@ Template.projectInfo.events = {
         var name = $(row).find('#project_name')[0].value;
         var customer = $(row).find('#customer')[0].value;
         var categories = $(row).find('#categories')[0].value;
-        var startDate = $(row).find('#start_date')[0].value;
-        var endDate = $(row).find('#end_date')[0].value;
+        var startDate = $(row).find('#startDate')[0].value;
+        var endDate = $(row).find('#endDate')[0].value;
 
         var manager = $(row).find('#manager')[0].value;
 
@@ -60,8 +60,8 @@ Template.projectInfo.events = {
         var name = $(row).find('#project_name')[0].value;
         var customer = $(row).find('#customer')[0].value;
         var categories = $(row).find('#categories')[0].value;
-        var startDate = $(row).find('#start_date')[0].value;
-        var endDate = $(row).find('#end_date')[0].value;
+        var startDate = $(row).find('#startDate')[0].value;
+        var endDate = $(row).find('#endDate')[0].value;
 
         var manager = $(row).find('select')[0].value;
 
@@ -101,8 +101,8 @@ Template.projectInfo.events = {
         var customer = $(row).find('#customer')[0].value;
 
         var categories = $(row).find('#categories')[0].value;
-        var startDate = $(row).find('#start_date')[0].value;
-        var endDate = $(row).find('#end_date')[0].value;
+        var startDate = $(row).find('#startDate')[0].value;
+        var endDate = $(row).find('#endDate')[0].value;
         var manager = $(row).find('#manager')[0].value;
 
         var project = ChargeNumbers.findOne({'_id': row.id});
@@ -126,7 +126,7 @@ Template.projectInfo.events = {
         });
     },
     'click #delete': function(event){
-        ChargeNumbers.remove(this._id);   
+        ChargeNumbers.remove(this._id);
     }
 
 };
@@ -317,7 +317,7 @@ Template.indirectChargeItems.events({
         });
     },
     'click #delete': function(event){
-        ChargeNumbers.remove(this._id);   
+        ChargeNumbers.remove(this._id);
     }
 });
 
