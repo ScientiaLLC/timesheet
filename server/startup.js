@@ -1,21 +1,22 @@
 function setupHolidayProject() {
-  var holiday = ChargeNumbers.findOne({'is_holiday': true});
-  var date = new Date();
-  var start = date.getMonth() + 1 + '/' + date.getDate() + '/' + date.getFullYear();
+  // var holiday = ChargeNumbers.findOne({'is_holiday': true});
 
-  if (!holiday) {
-    ChargeNumbers.insert(
-        {
-          id: '1000',
-          name: 'Holiday',
-          customer: 'Scientia',
-          startDate: start,
-          endDate: '∞',
-          manager: Meteor.settings.ldap_admin,
-          is_holiday: true,
-          indirect: true
-        });
-  }
+  // if (!holiday) {
+    ChargeNumbers.update(
+      {id: 'Holiday'},
+      {
+        id: 'Holiday',
+        name: 'Holiday',
+        customer: 'Scientia',
+        startDate: '10/26/2009',
+        endDate: '10/26/2999',
+        manager: Meteor.settings.ldap_admin,
+        is_holiday: true,
+        indirect: true
+      },
+      {upsert: true}
+    );
+  // }
 }
 
 // First, checks if it isn't implemented yet.
