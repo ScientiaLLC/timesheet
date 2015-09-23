@@ -9,7 +9,7 @@
     /*
      Returns all active timesheets (usually only one, unless another has been rejected)
      */
-    var userId = Session.get('LdapId');
+    var userId = Meteor.userId();
     var timesheetsMap = {};
     var timesheets = [];
 
@@ -86,7 +86,7 @@ Template.projectComments.helpers({
   },
   hours: function (projectId) {
     var date = Session.get("startDate");
-    var user = Session.get('LdapId');
+    var user = Meteor.userId();
     var data = Session.get('editing-user-page');
     if (data) {
       var userO = Meteor.users.findOne({username: data.username});
@@ -125,7 +125,7 @@ Template.projectComments.helpers({
      Returns the 'Goals for Next Week' field for the selected timesheet
      */
     var date = Session.get("startDate");
-    var user = Session.get('LdapId');
+    var user = Meteor.userId();
     var data = Session.get('editing-user-page');
     if (data) {
       var userO = Meteor.users.findOne({username: data.username});
@@ -153,7 +153,7 @@ Template.projectComments.helpers({
      Returns the 'This Weeks Issues' field for the selected timesheet
      */
     var date = Session.get("startDate");
-    var user = Session.get('LdapId');
+    var user = Meteor.userId();
     var data = Session.get('editing-user-page');
     if (data) {
       var userO = Meteor.users.findOne({username: data.username});
@@ -184,7 +184,7 @@ Template.projectComments.helpers({
      Returns the 'Manager Feedback' field for the selected timesheet
      */
     var date = Session.get("startDate");
-    var user = Session.get('LdapId');
+    var user = Meteor.userId();
     var data = Session.get('editing-user-page');
     if (data) {
       var userO = Meteor.users.findOne({username: data.username});
@@ -221,7 +221,7 @@ Template.projectComments.helpers({
 Template.totals.helpers({
   getDayTotal: function (day) {
     var date = Session.get("startDate");
-    var user = Session.get('LdapId');
+    var user = Meteor.userId();
     var data = Session.get('editing-user-page');
     var total = 0;
     if (data) {
@@ -250,7 +250,7 @@ Template.totals.helpers({
 
   getWeekTotal: function () {
     var date = Session.get("startDate");
-    var user = Session.get('LdapId');
+    var user = Meteor.userId();
     var data = Session.get('editing-user-page');
     var total = 0;
     if (data) {
@@ -293,7 +293,7 @@ Template.SelectedTimesheet.helpers({
     //console.log("Test");
 
     var date = Session.get("startDate");
-    var user = Session.get('LdapId');
+    var user = Meteor.userId();
     var data = Session.get('editing-user-page');
     if (data) {
       var userO = Meteor.users.findOne({username: data.username});
@@ -330,7 +330,7 @@ Template.SelectedTimesheet.helpers({
         }
       }
       // console.log("rows");
-   
+
       var EntryArray = projectEntries[i]['EntryArray'];
       for (j = 0; j < EntryArray.length; j++) {
         var comment = '';
@@ -385,7 +385,7 @@ Template.SelectedTimesheet.helpers({
      The field will be locked if the project has not been sent back (it is pending or approved).
      */
     var date = Session.get("startDate");
-    var user = Session.get('LdapId');
+    var user = Meteor.userId();
     var data = Session.get('editing-user-page');
     if (data) {
       var userO = Meteor.users.findOne({username: data.username});
@@ -442,7 +442,7 @@ Template.SelectedTimesheet.helpers({
   },
   date: function () {
     var date = Session.get("startDate");
-    var user = Session.get('LdapId');
+    var user = Meteor.userId();
     var sheet = TimeSheet.findOne({'startDate': date, 'userId': user});
     if (!sheet) return;
     return date + " - " + sheet.endDate;
@@ -462,7 +462,7 @@ Template.SelectedTimesheet.helpers({
      function, it will only ever return the one field.
      */
     var date = Session.get("startDate");
-    var user = Session.get('LdapId');
+    var user = Meteor.userId();
     var data = Session.get('editing-user-page');
     if (data) {
       var userO = Meteor.users.findOne({username: data.username});
@@ -504,7 +504,7 @@ Template.SelectedTimesheet.rendered = function () {
    submitted or not, and also whether projects were sent back.
    */
   var date = Session.get("startDate");
-  var user = Session.get('LdapId');
+  var user = Meteor.userId();
   var data = Session.get('editing-user-page');
   if (data) {
     var userO = Meteor.users.findOne({username: data.username});
@@ -532,7 +532,7 @@ Template.projectListDropDown.helpers({
      the list if the timesheet is submitted and that project is already approved or pending.
      */
     var date = Session.get("startDate");
-    var userId = Session.get('LdapId');
+    var userId = Meteor.userId();
     var data = Session.get('editing-user-page');
     var projectsNotAllowed = [];
     if (data) {
@@ -638,7 +638,7 @@ Template.projectListDropDown.helpers({
     return returnedProjects;
   },
   employees: function (projectSelected) {
-    var user = Meteor.users.findOne({_id: Session.get('LdapId')});
+    var user = Meteor.user();
     var projects = ChargeNumbers.find({_id: {$in: user['projects']}});
     var returnedProjects = [];
     var selected = false;
@@ -677,7 +677,7 @@ Template.lastSection.rendered = function () {
    and also whether projects are being edited.
    */
   var date = Session.get("startDate");
-  var user = Session.get('LdapId');
+  var user = Meteor.userId();
   var data = Session.get('editing-user-page');
   if (data) {
     var userO = Meteor.users.findOne({username: data.username});
@@ -701,7 +701,7 @@ Template.lastSection.helpers({
      Returns the 'General Comment' field for the selected timesheet
      */
     var date = Session.get("startDate");
-    var user = Session.get('LdapId');
+    var user = Meteor.userId();
     var data = Session.get('editing-user-page');
     if (data) {
       var userO = Meteor.users.findOne({username: data.username});
@@ -720,7 +720,7 @@ Template.lastSection.helpers({
      Returns the 'Concerns' field for the selected timesheet
      */
     var date = Session.get("startDate");
-    var user = Session.get('LdapId');
+    var user = Meteor.userId();
     var data = Session.get('editing-user-page');
     if (data) {
       var userO = Meteor.users.findOne({username: data.username});
@@ -736,7 +736,7 @@ Template.lastSection.helpers({
   },
   isEditing: function () {
     var date = Session.get("startDate");
-    var user = Session.get('LdapId');
+    var user = Meteor.userId();
     var data = Session.get('editing-user-page');
     if (data) {
       var userO = Meteor.users.findOne({username: data.username});
@@ -806,14 +806,14 @@ Template.lastSection.events = {
     var row = event.currentTarget;
     var rowForComment = event.target;
 
-    
+
     var gen_comment = rowForComment.innerText;
     rowForComment.innerText = "";
-      
+
     if(gen_comment == null){
       gen_comment = '';
     }
-    var user = Session.get('LdapId');
+    var user = Meteor.userId();
     var data = Session.get('editing-user-page');
     if (data) {
       var userO = Meteor.users.findOne({username: data.username});
@@ -839,11 +839,11 @@ Template.lastSection.events = {
     var rowForComment = event.target;
     var concerns = rowForComment.innerText;
     rowForComment.innerText = "";
-    
+
     if(concerns == null){
       concerns = '';
     }
-    var user = Session.get('LdapId');
+    var user = Meteor.userId();
     var data = Session.get('editing-user-page');
     if (data) {
       var userO = Meteor.users.findOne({username: data.username});
@@ -865,7 +865,7 @@ Template.lastSection.events = {
      Submit a timesheet and update its history.
      */
     var date = Session.get("startDate");
-    var user = Session.get('LdapId');
+    var user = Meteor.userId();
     var data = Session.get('editing-user-page');
     if (data) {
       var userO = Meteor.users.findOne({username: data.username});
@@ -961,7 +961,11 @@ Template.lastSection.events = {
     });
     var totalHours = ActiveDBService.getTotalHoursForProject(sheet, projectId);
 
-    var managerName = Meteor.users.findOne({'_id': Session.get('LdapId')}).username;
+    var user = Meteor.user();
+    var managerName;
+    if (user) {
+      managerName = user.username;
+    }
 
     var revision = sheet.revision;
 
@@ -1009,7 +1013,11 @@ Template.lastSection.events = {
     });
     var totalHours = ActiveDBService.getTotalHoursForProject(sheet, projectId);
 
-    var managerName = Meteor.users.findOne({'_id': Session.get('LdapId')}).username;
+    var user = Meteor.user();
+    var managerName;
+    if (user) {
+      managerName = user.username;
+    }
 
     var revision = sheet.revision;
 
@@ -1047,7 +1055,7 @@ Template.projectComments.events = {
     }
     // var next = $(row).find('#Next')[0].innerTexts;
     var projectId = event.currentTarget.parentNode.parentNode.firstChild.parentNode.childNodes[3].id;
-    var user = Session.get('LdapId');
+    var user = Meteor.userId();
     var data = Session.get('editing-user-page');
     if (data) {
       var userO = Meteor.users.findOne({username: data.username});
@@ -1076,7 +1084,7 @@ Template.projectComments.events = {
       event.target.innerText = "";
     }
     var projectId = event.currentTarget.parentNode.parentNode.firstChild.parentNode.childNodes[3].id;
-    var user = Session.get('LdapId');
+    var user = Meteor.userId();
     var data = Session.get('editing-user-page');
     if (data) {
       var userO = Meteor.users.findOne({username: data.username});
@@ -1119,7 +1127,7 @@ Template.projectHoursFilled.events = {
     var projectIndex = $(row).find('#project_select')[0].selectedIndex;
     var projectId = $(row).find('#project_select')[0].children[projectIndex].id;
 
-    var user = Session.get('LdapId');
+    var user = Meteor.userId();
     var data = Session.get('editing-user-page');
     if (data) {
       var userO = Meteor.users.findOne({username: data.username});
@@ -1171,7 +1179,7 @@ Template.projectHoursFilled.events = {
 
     var rowID = $(row).attr('id');
     var date = Session.get("startDate");
-    var user = Session.get('LdapId');
+    var user = Meteor.userId();
     var data = Session.get('editing-user-page');
     if (data) {
       var userO = Meteor.users.findOne({username: data.username});
@@ -1248,7 +1256,7 @@ Template.projectHours.events = {
        Adding entry to the Database correctly. -Dan
        */
       var date = Session.get("startDate");
-      var user = Session.get('LdapId');
+      var user = Meteor.userId();
       var data = Session.get('editing-user-page');
       if (data) {
         var userO = Meteor.users.findOne({username: data.username});
@@ -1316,7 +1324,7 @@ TimeSheetService = {
      Check if any project on the timesheet has been rejected
      */
     var date = Session.get("startDate");
-    var user = Session.get('LdapId');
+    var user = Meteor.userId();
     var data = Session.get('editing-user-page');
     if (data) {
       var userO = Meteor.users.findOne({username: data.username});

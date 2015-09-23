@@ -47,41 +47,6 @@ Meteor.methods({
         });
     return;
   },
-  getEmployeesUnderManager: function () {
-    /*
-     Get all Employees that have worked for the given manager.
-     This is so a manager cannot see historical timesheets for other employees.
-     */
-    var user = Meteor.users.findOne({'_id': Session.get('LdapId')});
-
-    if (user.admin) {
-      var employees = Meteor.users.find();
-      var employeeIds = [];
-      employees.forEach(function (e) {
-        employeeIds.push(e._id);
-      });
-      return employeeIds
-    }
-
-    if (user.manager) {
-
-      var projects = ChargeNumbers.find({'manager': user.username});
-      var projectIds = [];
-      projects.forEach(function (p) {
-        projectIds.push(p._id);
-      });
-
-      var employees = Meteor.users.find({'projects': {$in: projectIds}});
-      var employeeIds = [];
-      employees.forEach(function (e) {
-        employeeIds.push(e._id);
-      });
-
-      return employeeIds;
-    }
-
-    return [user._id];
-  },
   updateIssuesTimeSheet: function (date, user, project, issues, data) {
     /*
      Update project comments seciton of an active timesheet for a specified project.

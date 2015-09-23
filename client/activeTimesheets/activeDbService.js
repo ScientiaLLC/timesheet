@@ -2,7 +2,7 @@ var timesheetsPidUsed = [];
 ActiveDBService = {
   getDayTotal: function (day) {
     var date = Session.get('startDate');
-    var user = Session.get('LdapId');
+    var user = Meteor.userId();
     var data = Session.get('editing-user-page');
     var total = 0;
     if (data) {
@@ -54,8 +54,10 @@ ActiveDBService = {
      Get all Employees that have worked for the given manager.
      This is so a manager cannot see historical timesheets for other employees.
      */
-    Meteor.user();
-    var user = Meteor.users.findOne({'_id': Session.get('LdapId')});
+    var user = Meteor.user();
+    if (!user) {
+      return [undefined];
+    }
 
     if (user.admin) {
       var employees = Meteor.users.find();
@@ -180,8 +182,8 @@ ActiveDBService = {
         }
       }
     }
-    
-     
+
+
     //return if the row should not be editable
     var data = Session.get('editing-user-page');
 

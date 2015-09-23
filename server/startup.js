@@ -49,7 +49,7 @@ function setupMissingTimesheets() {
       function (user) {
         //Small Change (changed uppercase D to d in userId) here to see if this works
         var projectApprovalArray = [];
-        if (user.projects.constructor === Array) {
+        if (user.projects && user.projects.constructor === Array) {
           user.projects.forEach(function (pId) {
             var project = ChargeNumbers.findOne({_id: pId});
             if (!project) {
@@ -64,6 +64,8 @@ function setupMissingTimesheets() {
               comment: ''
             });
           });
+        } else {
+          return;
         }
         var previousTimesheet = TimeSheet.findOne({
           'startDate': dStrL,
@@ -132,7 +134,7 @@ Meteor.startup(function () {
 
   setupMissingTimesheets();
 
-  scheduleMissingTimesheets('at 15:36 on Monday');
+  scheduleMissingTimesheets('at 00:00 on Saturday');
 
   scheduleReminders();
 

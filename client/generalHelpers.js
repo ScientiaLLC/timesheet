@@ -18,33 +18,6 @@
     var monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
     return monthNames[i];
   },
-  MakeTimesheetForNewUser: function (id, user) {
-    Meteor.call('getCurrentWeekObject', function (err, dateObject) {
-      if (!err) {
-        var dStr = (dateObject.start.getMonth() + 1) + '/' + dateObject.start.getDate() + '/' + dateObject.start.getFullYear(),
-            d2Str = (dateObject.end.getMonth() + 1) + '/' + dateObject.end.getDate() + '/' + dateObject.end.getFullYear();
-
-        var projectApprovalArray = [];
-        user.projects.forEach(function (pId) {
-          var project = ChargeNumbers.findOne({_id: pId});
-          if (!project) {
-            Meteor.call("removeEmployeeFromProject", user._id, pId);
-            return;
-          }
-          projectId = project._id;
-          projectApprovalArray.push({
-            projectId: projectId,
-            approved: false,
-            sentBack: false,
-            comment: ''
-          });
-        });
-
-        Meteor.call("insertTimesheet", dStr, d2Str, id, 1, [], [], 1, '', false, projectApprovalArray, '', false);
-
-      }
-    });
-  },
   makePDF: function (startDate, userID) {
     var employee = Meteor.users.findOne({'_id': userID});
     var employeename = employee.username;
@@ -313,7 +286,7 @@
       }
     });
     console.log(genCon);
-    
+
   //   var revision = sheet['revision'];
    // var projectEntries = sheet['projectEntriesArray'];
    //  var revision = sheet['revision'];
@@ -378,7 +351,7 @@
       ]);
     }
     var maxRow = -1;
-    //Added the employees username to the rows, issueRows, commentRows and genRows arrays to be put in the sections when the pdf is made, so the name of the user was next to their hours/comments 
+    //Added the employees username to the rows, issueRows, commentRows and genRows arrays to be put in the sections when the pdf is made, so the name of the user was next to their hours/comments
     for (i = 0; i < projectEntries.length; i++) {
       var project = projectEntries[i]['projectId'];
       var project2 = ChargeNumbers.findOne({'_id': project});

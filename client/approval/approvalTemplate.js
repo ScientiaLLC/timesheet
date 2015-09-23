@@ -76,7 +76,7 @@ Template.toApprove_Template.helpers({
             };
           }
           if(!containsInArray(pe.projectId,zeroEntry) || Session.get('showZeroHours')){
-            
+
             totals[t.userId] =
             {
               total: totals[t.userId].total + total,
@@ -153,11 +153,15 @@ Template.toApprove_Users.helpers({
   showUserHours: function(){
     var selected = Session.get('current_user');
     var projectId = '';
-    // console.log("selected"+selected);
     var totals = {};
     var hasSubmitted = {};
-    var userID = Meteor.users.findOne({'username': selected})._id;
-    // console.log(userId);
+    var userID = undefined;
+    if (selected) {
+      var user = Meteor.users.findOne({'username': selected});
+      if (user) {
+        userId = user._id;
+      }
+    }
     var total = 0;
     var projectHoursArray = [];
     var startDateStr = Session.get("startDate");
@@ -171,18 +175,13 @@ Template.toApprove_Users.helpers({
 
     timesheets.forEach(function (t) {
       var pApprovals = {};
-      // console.log(t);
-        // var usernameId = t
-        for (var i in t.projectApprovalArray) {
-          pApprovals[t.projectApprovalArray[i].projectId] = t.projectApprovalArray[i].approved;
-        }
+      for (var i in t.projectApprovalArray) {
+        pApprovals[t.projectApprovalArray[i].projectId] = t.projectApprovalArray[i].approved;
+      }
 
 
       t.projectEntriesArray.forEach(function (pe) {
         projectId = pe.projectId;
-        // console.log("pe");
-        // console.log(pe);
-        // console.log("projectID "+projectId);
         if (!pApprovals[pe.projectId]) {
          Session.set('current_user_project_to_approve', pe.projectId);
           pe.EntryArray.forEach(function (a) {
@@ -222,9 +221,8 @@ Template.toApprove_Users.helpers({
           projectHoursArray.push(projectId);
         }
         total =0;
-        
+
       });
-      // console.log(projectHoursArray);
       hasSubmitted[t.userId] = t.submitted;
       if (totals[t.userId] == null) {
         var show = true;
@@ -245,7 +243,6 @@ Template.toApprove_Users.helpers({
         }
       }
     });
-  // console.log(totals);
     for (var key in totals) {
       if (totals.hasOwnProperty(key) && (!totals[key].approved || Session.get('showAll'))) {
         var u = Meteor.users.findOne({_id: userID});
@@ -280,12 +277,6 @@ Template.toApprove_Users.helpers({
 
     toReturn = toReturn.sort(compare);
 
-    // if (toReturn[0]) {
-    //   toReturn[0].selected = 'selected';
-    //   Session.set('current_user', toReturn[0].username);
-    // }
-    // console.log("toReturn");
-    // console.log(toReturn);
     return toReturn;
   },
 });
@@ -312,7 +303,11 @@ Template.toApprove_Template.events({
     });
     var totalHours = ActiveDBService.getTotalHoursForProject(sheet, projectId);
 
-    var managerName = Meteor.users.findOne({'_id': Session.get('LdapId')}).username;
+    var user = Meteor.user();
+    var managerName;
+    if (user) {
+      managerName = user.username;
+    }
 
     var revision = sheet.revision;
 
@@ -363,7 +358,11 @@ Template.toApprove_Template.events({
     });
     var totalHours = ActiveDBService.getTotalHoursForProject(sheet, projectId);
 
-    var managerName = Meteor.users.findOne({'_id': Session.get('LdapId')}).username;
+    var user = Meteor.user();
+    var managerName;
+    if (user) {
+      managerName = user.username;
+    }
 
     var revision = sheet.revision;
 
@@ -422,16 +421,22 @@ Template.approval_Template.helpers({
     var projectName = Session.get('current_user_project_to_approve');
 
     var startDate = new Date(Session.get("startDate"));
+    var userId = undefined;
     if (!username) {
       return false;
+    } else {
+      var user = Meteor.users.findOne({username: username});
+      if (user) {
+        userId = user._id;
+      } else {
+        return false;
+      }
     }
-    var userId = Meteor.users.findOne({username: username})._id;
     var sheet = TimeSheet.findOne({
       'startDate': startDate.toLocaleDateString(),
       'userId': userId
     });
     return (sheet.active == 1);
-
   },
   needsApproving: function () {
     var selected = Session.get('current_project_to_approve');
@@ -454,7 +459,7 @@ Template.approval_Template.helpers({
   },
   'managedProjects': function () {
     "use strict";
-    var user = Meteor.users.findOne({'_id': Session.get('LdapId')});
+    var user = Meteor.user();
     if (!user || (!user.manager && !user.admin)) {
       return;
     }
@@ -514,7 +519,7 @@ Template.approval_Template.helpers({
     return toReturn;
   },
   'managedUser': function(){
-    var toReturn = []; 
+    var toReturn = [];
     Meteor.users.find().fetch().map(function (emp) {
         toReturn.push({
           name: emp.username,
@@ -607,16 +612,28 @@ Template.approval_Template.helpers({
   },
   userSearchTimesheet: function () {
     var chargeNumber_name = Session.get('current_user_project_to_approve');
-    var chargeNumber_id = ChargeNumbers.findOne({'name': chargeNumber_name})._id;
-    // Session.set('current_user_project_to_approve', chargeNumber_id);
+    var chargeNumber_id = undefined;
+    if (chargeNumber_name) {
+      var cn = ChargeNumbers.findOne({'name': chargeNumber_name});
+      if (cn) {
+        chargeNumber_id = cn._id;
+      }
+    }
     var username = Session.get('current_user');
-    if (!username) return;
-    // var userId = Meteor.users.findOne({'username': username})._id;
+    var userid = undefined;
+    if (!username) {
+      return;
+    } else {
+      user = Meteor.users.findOne({'username': username});
+      if (user) {
+        userid = user._id;
+      }
+    }
 
     var startDateStr = Session.get("startDate");
     var startDate = new Date(startDateStr);
     var timesheets = TimeSheet.find({
-      'userId': Meteor.users.findOne({'username': username})._id,
+      'userId': userid,
       'startDate': startDate.toLocaleDateString()
     });
 
@@ -686,7 +703,7 @@ Template.approval_Template.helpers({
     return toReturn;
   },
   isAdmin: function () {
-    var user = Meteor.users.findOne({'_id': Session.get('LdapId')});
+    var user = Meteor.user();
     if (user && user.admin) {
       return true;
     } else {
@@ -743,7 +760,7 @@ Template.approval_Template.events({
     }else if(lastSelection.childNodes[2].id === 'project'){
       // Session.set('current_user_to_approve', lastSelection.childNodes[2].childNodes[1].childNodes[3].childNodes[1].textContent);
       Session.set('current_user_project_to_approve', lastSelection.childNodes[2].firstChild.textContent);
-    } 
+    }
 
   },
   'click .edit-sheet': function () {
@@ -789,7 +806,7 @@ Template.approval_Template.events({
       e.target.innerHTML = "Show Zero Hours";
     }
   }
-  
+
 });
 
 Template.date_picker.helpers({

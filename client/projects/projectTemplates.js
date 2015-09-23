@@ -1,12 +1,3 @@
-//Get the manager groups
-
-Meteor.startup(function() {
- Meteor.call('getLdapManagerGroups', function (error, data) {
-   if (!error){
-     Session.set('manager_groups', data);
-   }
- });
-});
 
 Template.activeProjectEntries.helpers({
     projects: function(){
@@ -221,16 +212,27 @@ Template.addProject.events = {
     }
 };
 
+Template.employeesListDropDown.onCreated(function () {
+  Meteor.call('getLdapManagerGroups', function (error, data) {
+    if (!error) {
+      Session.set('manager_groups', data);
+    }
+  });
+});
+
 Template.employeesListDropDown.helpers({
     employees: function() {
-        return Meteor.users.find({});
+      return Meteor.users.find({});
     },
     managers: function() {
-        var managerGroups = [];
-        Session.get('manager_groups').forEach(function (group){
-            managerGroups.push({username: group});
+      var managerGroups = [];
+      var data = Session.get('manager_groups');
+      if (data) {
+        data.forEach(function (group) {
+          managerGroups.push({username: group});
         });
-	return managerGroups;
+      }
+      return managerGroups;
     }
 });
 

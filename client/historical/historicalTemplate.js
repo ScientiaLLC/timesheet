@@ -1,6 +1,6 @@
 (function(){Template.PDF.events = {
   'click button': function (event) {
-    var userID = Session.get('LdapId');
+    var userID = Meteor.userId();
     if (Session.get('search_employee')) {
       userID = Session.get('search_employee');
     }
@@ -27,7 +27,7 @@ Template.historyHeader.helpers({
     var subordinates = ActiveDBService.getEmployeesUnderManager();
     var sort = {'sort': {'userId': 1, 'startDate': -1}};
 
-    var user = Meteor.users.findOne({'_id': Session.get('LdapId')});
+    var user = Meteor.user();
     var managerProjects = ChargeNumbers.find({'manager': {$in: user.groups}});
     var managerProjIds = [];
     managerProjects.forEach(function (p) {
@@ -108,7 +108,7 @@ Template.historyHeader.helpers({
   },
 
   ActiveTimesheet: function (userId, active) {
-    if (active && (userId === Session.get('LdapId'))) {
+    if (active && (userId === Meteor.userId())) {
       return true;
     }
     return false;
@@ -128,7 +128,7 @@ function findOneInArray(array1, array2) {
 
 Template.historicalEntries.helpers({
   isManager: function () {
-    var user = Meteor.users.findOne({'_id': Session.get('LdapId')});
+    var user = Meteor.user();
     if (user && (user.manager || user.admin)) {
       return true;
     } else {
@@ -139,7 +139,7 @@ Template.historicalEntries.helpers({
 
 Template.historyInfo.helpers({
   isAdmin: function () {
-    var user = Meteor.users.findOne({'_id': Session.get('LdapId')});
+    var user = Meteor.user();
     if (user && user.admin) {
       return true;
     } else {
@@ -249,7 +249,7 @@ Template.history_month_picker.events({
 
 Template.historyYearSelect.helpers({
   getYears: function () {
-    var userId = Session.get('LdapId');
+    var userId = Meteor.userId();
     if (Session.get('search_employee')) {
       userId = Session.get('search_employee');
     }
@@ -293,7 +293,7 @@ Template.historyInfo.events({
 Template.SelectedHistoryTimesheet.helpers({
   row: function () {
     var date = Session.get('startDate');
-    var user = Session.get('LdapId');
+    var user = Meteor.userId();
     if (Session.get('search_employee')) {
       user = Session.get('search_employee');
     }
@@ -352,7 +352,7 @@ Template.SelectedHistoryTimesheet.helpers({
 
   project: function () {
     var date = Session.get('startDate');
-    var user = Session.get('LdapId');
+    var user = Meteor.userId();
     if (Session.get('search_employee')) {
       user = Session.get('search_employee');
     }
@@ -390,7 +390,7 @@ Template.SelectedHistoryTimesheet.helpers({
 
   timesheethack: function () {
     var date = Session.get('startDate');
-    var user = Session.get('LdapId');
+    var user = Meteor.userId();
     if (Session.get('search_employee')) {
       user = Session.get('search_employee');
     }
@@ -430,7 +430,7 @@ Template.historyProjectComments.helpers({
 
   next: function (projectId) {
     var date = Session.get('startDate');
-    var user = Session.get('LdapId');
+    var user = Meteor.userId();
     if (Session.get('search_employee')) {
       user = Session.get('search_employee');
     }
@@ -449,7 +449,7 @@ Template.historyProjectComments.helpers({
 
   issues: function (projectId) {
     var date = Session.get('startDate');
-    var user = Session.get('LdapId');
+    var user = Meteor.userId();
     if (Session.get('search_employee')) {
       user = Session.get('search_employee');
     }
@@ -470,7 +470,7 @@ Template.historyProjectComments.helpers({
 
   message: function (projectId) {
     var date = Session.get('startDate');
-    var user = Session.get('LdapId');
+    var user = Meteor.userId();
     if (Session.get('search_employee')) {
       user = Session.get('search_employee');
     }
@@ -493,7 +493,7 @@ Template.historyProjectComments.helpers({
 Template.historyLastSection.helpers({
   genComment: function () {
     var date = Session.get('startDate');
-    var user = Session.get('LdapId');
+    var user = Meteor.userId();
     if (Session.get('search_employee')) {
       user = Session.get('search_employee');
     }
@@ -508,7 +508,7 @@ Template.historyLastSection.helpers({
 
   concerns: function () {
     var date = Session.get('startDate');
-    var user = Session.get('LdapId');
+    var user = Meteor.userId();
     var sheet = TimeSheet.findOne({'startDate': date, 'userId': user});
 
     if (sheet.submitted) {
@@ -523,7 +523,7 @@ Template.historyLog.helpers({
   revisions: function () {
     var revisionArray = [];
     var date = Session.get('startDate');
-    var user = Session.get('LdapId');
+    var user = Meteor.userId();
     if (Session.get('search_employee')) {
       user = Session.get('search_employee');
     }
@@ -577,7 +577,7 @@ Template.historyEmployeeSelect.events({
      });
     }
 
-    var user = Meteor.users.findOne({'_id': Session.get('LdapId')});
+    var user = Meteor.user();
 
     if (user.admin) {
       Session.set('search_employee', employeeID);
@@ -608,7 +608,7 @@ Template.historyEmployeeSelect.helpers({
    auto_projects: function () {
     'use strict';
     var toReturn = [];
-    var person = Meteor.users.findOne({'_id': Session.get('LdapId')});
+    var person = Meteor.user();
     if (person === null || (!person.manager && !person.admin)) {
       return;
     }
@@ -646,7 +646,7 @@ Template.historyEmployeeSelect.helpers({
 Template.historical_totals.helpers({
   getDayTotal: function (day) {
     var date = Session.get('startDate');
-    var user = Session.get('LdapId');
+    var user = Meteor.userId();
     var data = Session.get('editing-user-page');
     var total = 0;
     if (data) {
@@ -675,7 +675,7 @@ Template.historical_totals.helpers({
 
   getWeekTotal: function () {
     var date = Session.get('startDate');
-    var user = Session.get('LdapId');
+    var user = Meteor.userId();
     var data = Session.get('editing-user-page');
     var total = 0;
     if (data) {
