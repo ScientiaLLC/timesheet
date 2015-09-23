@@ -33,8 +33,8 @@ Template.historyHeader.helpers({
     managerProjects.forEach(function (p) {
       managerProjIds.push(p.id);
     });
-  
-    
+
+
     // logger.debug('userId = ' + userId);
     if (userId !== '') {
       TimeSheet.find({
@@ -44,13 +44,13 @@ Template.historyHeader.helpers({
             // logger.debug('u(userID found) = ' + JSON.stringify(u));
             u.projectEntriesArray.forEach(function (p) {
               if(p.projectId === project){
-                
+
                   timesheetProjects.push(p.projectId);
-                              
+
                 if (findOneInArray(managerProjIds, timesheetProjects)  || u.userId === user._id || user.admin ){//&& !containsInArray(p.projectId, timesheetProjects)) {
                   timesheets = (ActiveDBService.getTimesheetRowInfo(u, timesheets, p.projectId));
-                }  
-              }  
+                }
+              }
             });
           });
     } else {
@@ -60,29 +60,28 @@ Template.historyHeader.helpers({
           function (u) {
             // logger.debug('u(userID not found) = ' + JSON.stringify(u));
             u.projectEntriesArray.forEach(function (p) {
-              
+
               if(p.projectId === project){
-                
+
                   timesheetProjects.push(p.projectId);
-                              
+
                 if (findOneInArray(managerProjIds, timesheetProjects)  || u.userId === user._id || user.admin ){//&& !containsInArray(p.projectId, timesheetProjects)) {
                   timesheets = (ActiveDBService.getTimesheetRowInfo(u, timesheets, p.projectId));
-                }  
-              }  
+                }
+              }
             });
-            
+
         });
       }
-      
+
     // logger.debug('timesheets = ' + JSON.stringify(timesheets));
     return timesheets;
-    
+
   },
 
   getProjects: function () {
     var projects = [];
 
-    console.log(Session.get('search_project'));
     if(Session.get('search_project') == ''){
       ChargeNumbers.find().forEach(function (p) {
         TimeSheet.find().forEach(function (timesheets){
@@ -104,7 +103,7 @@ Template.historyHeader.helpers({
           }
         });
       });
-    }  
+    }
     return projects;
   },
 
@@ -182,7 +181,7 @@ Template.history_month_picker.helpers({
       currentTime = new Date();
       currentTime.setDate(1);
       Session.set('historyDate', currentTime);
-  
+
     return generalHelpers.getMonthName(currentTime.getMonth());
   }
 });
@@ -567,7 +566,7 @@ Template.historyEmployeeSelect.events({
     employees.forEach(function (e) {
       employeeID = e._id;
     });
-   
+
     var project = document.getElementById('defaultproject').value;
     console.log()
     var projectId = '';
@@ -633,7 +632,7 @@ Template.historyEmployeeSelect.helpers({
   },
 
   auto_employees: function () {
-    var toReturn = []; 
+    var toReturn = [];
     Meteor.users.find().fetch().map(function (emp) {
         toReturn.push({
           name: emp.username,

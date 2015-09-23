@@ -15,15 +15,15 @@ Template.associatedProjects.helpers({
   },
   addCategory: function(projectId){
     var project = ChargeNumbers.findOne({'_id': projectId});
-    var splitByComma = project.categories.split(",");
-    toReturn = [];
-    splitByComma.forEach(function (cat){
-      toReturn.push({category: cat});
-    }); 
-    // console.log(toReturn);
-  return toReturn;
+    var toReturn = [];
+    if (project.categories) {
+      var splitByComma = project.categories.split(",");
+      splitByComma.forEach(function (cat){
+        toReturn.push({category: cat});
+      });
+    }
+    return toReturn;
   }
-  
 });
 
 Template.employees_Template.events({
@@ -100,7 +100,7 @@ Template.associatedProjects.events({
     projectEntryArr.forEach(function(pe){
       pe.forEach(function(entry){
         if(entry.projectId === projectId){
-          var project = { 
+          var project = {
             'projectId': projectId,
              'category': category,
              'EntryArray': entry.EntryArray
@@ -110,7 +110,6 @@ Template.associatedProjects.events({
         newProjectEntry.push(entry);
       }
       });
-      console.log(newProjectEntry);
     });
     //updating Timesheet
     TimeSheet.update({'_id': toUpdate},
@@ -119,13 +118,11 @@ Template.associatedProjects.events({
           'projectEntriesArray': newProjectEntry
         }
       });
-    
+
       $('.toast').addClass('active');
       setTimeout(function () {
         $('.toast').removeClass('active');
         }, 5000);
-    
-
   }
 });
 
